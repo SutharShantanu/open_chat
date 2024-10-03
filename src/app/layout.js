@@ -1,19 +1,12 @@
+// import "./globals.css";
 "use client";
 
-import localFont from "next/font/local";
-import { GeistProvider, CssBaseline } from "@geist-ui/core";
-import "./globals.css";
 
-const geistSans = localFont({
-    src: "./fonts/GeistVF.woff",
-    variable: "--font-geist-sans",
-    weight: "100 900",
-});
-const geistMono = localFont({
-    src: "./fonts/GeistMonoVF.woff",
-    variable: "--font-geist-mono",
-    weight: "100 900",
-});
+import Navbar from "@/app/components/Navbar";
+// import Footer from "./components/Footer";
+import { ChakraProvider } from "@chakra-ui/react";
+import { store } from "./store";
+import { Provider } from "react-redux";
 
 // export const metadata = {
 //     title: "Create Next App",
@@ -23,13 +16,19 @@ const geistMono = localFont({
 export default function RootLayout({ children }) {
     return (
         <html lang="en">
-            <GeistProvider>
-                <CssBaseline />
-                <body
-                    className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-                    {children}
-                </body>
-            </GeistProvider>
+            <Provider store={store}>
+            <ChakraProvider>
+                <div className="">
+                    <body className={``}>
+                        <Navbar />
+                        <div className="border border-red-500 !bg-zinc-100">
+                            {children}
+                        </div>
+                        {/*<Footer />*/}
+                    </body>
+                </div>
+            </ChakraProvider>
+            </Provider>
         </html>
     );
 }

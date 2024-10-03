@@ -1,57 +1,73 @@
 "use client";
-import { useEffect, useState } from "react";
+
+import { useEffect, useState, Fragment } from "react";
 import { useRouter } from "next/navigation";
 import io from "socket.io-client";
+import { Input, Button, Modal, Text, Container, Card } from "@chakra-ui/react";
+import { useDispatch, useSelector } from "react-redux";
 import {
-    GeistProvider,
-    CssBaseline,
-    Input,
-    Button,
-    Modal,
-    Text,
-    Page,
-    Card,
-} from "@geist-ui/core";
+    setUsername,
+    setRoom,
+    setIsConnected,
+    setTransport,
+    setSelectedRoom,
+} from "@/app/store/chatSlice";
 
 let socket;
 
 export default function Home() {
-    const [username, setUsername] = useState("");
-    const [room, setRoom] = useState("");
-    const [rooms, setRooms] = useState([]);
-    const [modalVisible, setModalVisible] = useState(false); // Default to false
-    const [selectedRoom, setSelectedRoom] = useState(""); // Track selected room
+    const dispatch = useDispatch();
+    const { username, room, isConnected, transport, selectedRoom, rooms } =
+        useSelector((state) => state.chat);
+    const [modalVisible, setModalVisible] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
         socket = io();
+
+        socket.on("connect", () => {
+            dispatch(setIsConnected(true));
+            dispatch(setTransport(socket.io.engine.transport.name));
+        });
+
+        socket.on("disconnect", () => {
+            dispatch(setIsConnected(false));
+        });
+
+        socket.io.on("transport", (transport) => {
+            dispatch(setTransport(transport));
+        });
+
         socket.on("availableRooms", (rooms) => {
-            setRooms(rooms);
+            dispatch(setRoom(rooms));
         });
 
         return () => {
             socket.disconnect();
         };
-    }, []);
+    }, [dispatch]);
 
-    // Handle room join when modal is confirmed
     const handleJoin = () => {
         if (username.trim() && selectedRoom.trim()) {
             router.push(`/chat/${selectedRoom}?username=${username}`);
         }
     };
 
-    // Display modal and set the selected room
     const handleJoinRoom = (roomName) => {
-        setSelectedRoom(roomName);
-        setModalVisible(true); // Show modal only when a room is selected
+        dispatch(setSelectedRoom(roomName));
+        setModalVisible(true);
     };
 
     return (
-        <GeistProvider>
-            <CssBaseline />
-            <Page className="bg-gray-900 min-h-screen flex flex-col justify-center items-center">
-                {/* Modal for entering username */}
+        <Fragment>
+            <Container className="bg-zinc-100 flex flex-col justify-center items-center">
+                <p className="text-black mb-4">
+                    Status: {isConnected ? "Connected" : "Disconnected"}
+                </p>
+                <p className="text-black mb-6">
+                    {transport && `Transport: ${transport}`}
+                </p>
+
                 <Modal
                     visible={modalVisible}
                     onClose={() => setModalVisible(false)}
@@ -61,7 +77,9 @@ export default function Home() {
                         <Input
                             placeholder="Enter your username"
                             value={username}
-                            onChange={(e) => setUsername(e.target.value)}
+                            onChange={(e) =>
+                                dispatch(setUsername(e.target.value))
+                            } // Set username in Redux
                         />
                     </Modal.Content>
                     <Modal.Action onClick={() => setModalVisible(false)}>
@@ -74,15 +92,14 @@ export default function Home() {
                     </Modal.Action>
                 </Modal>
 
-                {/* Main UI */}
-                <Text h2 className="text-white">
+                <Text h2 className="text-black">
                     Join a Chat Room
                 </Text>
                 <div className="w-full lg:w-1/3 p-4 bg-gray-800 rounded-lg mb-6">
                     <Input
                         placeholder="Create or enter room name"
                         value={room}
-                        onChange={(e) => setRoom(e.target.value)}
+                        onChange={(e) => dispatch(setRoom(e.target.value))}
                         className="mb-4"
                     />
                     <Button
@@ -93,8 +110,7 @@ export default function Home() {
                     </Button>
                 </div>
 
-                {/* Available Rooms List */}
-                <Text h3 className="text-white">
+                <Text h3 className="text-black">
                     Available Rooms
                 </Text>
                 <div className="grid gap-4 mt-4">
@@ -102,18 +118,18 @@ export default function Home() {
                         rooms.map((roomName, index) => (
                             <Card
                                 key={index}
-                                className="bg-gray-700 p-4 text-white cursor-pointer"
+                                className="bg-gray-700 p-4 text-black cursor-pointer"
                                 onClick={() => handleJoinRoom(roomName)}>
                                 {roomName}
                             </Card>
                         ))
                     ) : (
-                        <Text h4 className="text-white">
+                        <Text h4 className="text-black">
                             No rooms available. Create a new room!
                         </Text>
                     )}
                 </div>
-            </Page>
-        </GeistProvider>
+            </Container>
+        </Fragment>
     );
 }
