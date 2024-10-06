@@ -1,7 +1,7 @@
 // import "./globals.css";
 "use client";
 
-
+import { Analytics } from "@vercel/analytics/react";
 import Navbar from "@/app/components/Navbar";
 // import Footer from "./components/Footer";
 import { ChakraProvider } from "@chakra-ui/react";
@@ -14,21 +14,18 @@ import { Provider } from "react-redux";
 // };
 
 export default function RootLayout({ children }) {
-    return (
-        <html lang="en">
-            <Provider store={store}>
-            <ChakraProvider>
-                <div className="">
-                    <body className={``}>
-                        <Navbar />
-                        <div className="border border-red-500 !bg-zinc-100">
-                            {children}
-                        </div>
-                        {/*<Footer />*/}
-                    </body>
-                </div>
-            </ChakraProvider>
-            </Provider>
-        </html>
-    );
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <Provider store={store}>
+        <ChakraProvider>
+          <Analytics />
+          <body className={``}>
+            <Navbar />
+            {children}
+            {/*<Footer />*/}
+          </body>
+        </ChakraProvider>
+      </Provider>
+    </html>
+  );
 }
