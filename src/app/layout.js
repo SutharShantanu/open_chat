@@ -21,7 +21,9 @@ export default function RootLayout({ children }) {
           <Analytics />
           <body className={``}>
             <Navbar />
+            <div className={`mt-4 border border-red-500`}>
             {children}
+            </div>
             {/*<Footer />*/}
           </body>
         </ChakraProvider>
