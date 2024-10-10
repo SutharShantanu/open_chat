@@ -4,7 +4,7 @@
 import { Analytics } from "@vercel/analytics/react";
 import Navbar from "@/app/components/Navbar";
 // import Footer from "./components/Footer";
-import { ChakraProvider } from "@chakra-ui/react";
+import { Box, ChakraProvider } from "@chakra-ui/react";
 import { store } from "./store";
 import { Provider } from "react-redux";
 
@@ -21,9 +21,9 @@ export default function RootLayout({ children }) {
           <Analytics />
           <body className={``}>
             <Navbar />
-            <div className={`mt-4 border border-red-500`}>
-            {children}
-            </div>
+            <Box className={`mt-4 border border-red-500`} bgColor="gray.100">
+              {children}
+            </Box>
             {/*<Footer />*/}
           </body>
         </ChakraProvider>

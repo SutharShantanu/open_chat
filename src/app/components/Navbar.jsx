@@ -18,6 +18,7 @@ import {
   IconButton,
   VStack,
   Spacer,
+  Divider,
 } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
@@ -34,8 +35,6 @@ const Navbar = () => {
   const { username, isConnected } = useSelector((state) => state.chat);
   const router = useRouter();
 
-  // just fixing branch issue
-
   return (
     <Flex
       width="full"
@@ -44,6 +43,7 @@ const Navbar = () => {
       alignItems="center"
       justifyContent="space-between"
       p="4"
+      columnGap="4"
       shadow="base"
       bg="black"
     >
@@ -51,6 +51,8 @@ const Navbar = () => {
         fontSize={{ base: "md", md: "lg", lg: "xl" }}
         fontWeight="bold"
         color="white"
+        whiteSpace="nowrap"
+        width="fit-content"
       >
         Chat App
       </Text>
@@ -59,6 +61,8 @@ const Navbar = () => {
         spacing="8"
         display={{ base: "none", md: "flex" }}
         alignItems="center"
+        width="full"
+        justifyContent="space-between"
       >
         <Link
           href="/signup"
@@ -74,51 +78,57 @@ const Navbar = () => {
         >
           Login
         </Link>
-        {/* <Button colorScheme="teal" rounded="none" onClick={onOpen}>
-          Open Modal
-        </Button> */}
       </HStack>
 
-      <IconButton
-        aria-label="Menu"
-        rounded="full"
-        icon={<VscDebugPause />}
-        display={{ base: "flex", md: "none" }} // Show on mobile
-        onClick={onDrawerOpen}
-        bgColor="white"
-        transform="rotate(90deg)" // Use Chakra's transform property for rotation
-      />
+      {/* Aligning the IconButton to the right */}
+      <Flex flex="1" justify="flex-end">
+        <IconButton
+          aria-label="Menu"
+          rounded="full"
+          size="sm"
+          width="fit-content"
+          icon={<VscDebugPause size="20px" />}
+          display={{ base: "flex", md: "none" }}
+          onClick={onDrawerOpen}
+          bgColor="white"
+          transform="rotate(90deg)"
+        />
 
-      <Drawer isOpen={isDrawerOpen} placement="right" onClose={onDrawerClose}>
-        <DrawerOverlay />
-        <DrawerContent>
-          <DrawerCloseButton />
-          <DrawerHeader>Menu</DrawerHeader>
-          <DrawerBody>
-            <VStack spacing={4} align="start">
-              <Link href="/signup" onClick={onDrawerClose}>
-                Signup
-              </Link>
-              <Link href="/login" onClick={onDrawerClose}>
-                Login
-              </Link>
-              <Button
-                colorScheme="teal"
-                rounded="none"
-                width="full"
-                onClick={() => {
-                  onOpen();
-                  onDrawerClose();
-                }}
-              >
-                Open Modal
-              </Button>
-            </VStack>
-          </DrawerBody>
-        </DrawerContent>
-      </Drawer>
-
-      <Spacer />
+        <Drawer isOpen={isDrawerOpen} placement="right" onClose={onDrawerClose}>
+          <DrawerOverlay />
+          <DrawerContent>
+            <DrawerCloseButton
+              rounded="full"
+              bgColor="black"
+              color="white"
+              size="sm"
+            />
+            <DrawerHeader>Menu</DrawerHeader>
+            <Divider />
+            <DrawerBody>
+              <VStack spacing={4} align="start">
+                <Link href="/signup" onClick={onDrawerClose}>
+                  Signup
+                </Link>
+                <Link href="/login" onClick={onDrawerClose}>
+                  Login
+                </Link>
+                <Button
+                  colorScheme="teal"
+                  rounded="none"
+                  width="full"
+                  onClick={() => {
+                    onOpen();
+                    onDrawerClose();
+                  }}
+                >
+                  Open Modal
+                </Button>
+              </VStack>
+            </DrawerBody>
+          </DrawerContent>
+        </Drawer>
+      </Flex>
 
       <LoginUser isOpen={isOpen} onClose={onClose} />
     </Flex>

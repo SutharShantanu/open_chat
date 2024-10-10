@@ -90,7 +90,7 @@ export default function Home() {
           {transport && `Transport: ${transport}`}
         </Text>
 
-        <Modal isOpen={modalVisible} onClose={() => setModalVisible(false)}>
+        {/* <Modal isOpen={modalVisible} onClose={() => setModalVisible(false)}>
           <ModalOverlay />
           <ModalContent
             width={{ base: "90%", md: "400px", lg: "500px", xl: "600px" }}
@@ -117,7 +117,7 @@ export default function Home() {
             </ModalFooter>
           </ModalContent>
         </Modal>
-
+ */}
         <Text
           as="h2"
           color="black"
@@ -129,7 +129,7 @@ export default function Home() {
         </Text>
 
         <Box
-          w={{ base: "full", md: "50%", lg: "33%" }}
+          w={{ base: "full", md: "80%", lg: "70%" }}
           bg="gray.800"
           p={4}
           borderRadius="md"
