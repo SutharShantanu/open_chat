@@ -34,6 +34,8 @@ const Navbar = () => {
   const { username, isConnected } = useSelector((state) => state.chat);
   const router = useRouter();
 
+  // just fixing branch issue
+
   return (
     <Flex
       width="full"
