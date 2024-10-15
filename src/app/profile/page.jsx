@@ -5,17 +5,14 @@ import {
   Button,
   Text,
   Card,
-  Container,
-  Stack,
   FormLabel,
   Image,
-  InputGroup,
-  InputRightElement,
   FormControl,
   FormErrorMessage,
   Flex,
   VStack,
   Box,
+  Stack,
 } from "@chakra-ui/react";
 import {
   MdEmail,
@@ -30,6 +27,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
+import { useSession } from "next-auth/react"
 
 // Validation schema using Zod
 const profileSchema = z.object({
@@ -43,19 +41,10 @@ const profileSchema = z.object({
 });
 
 export default function Profile() {
-  const [avatar, setAvatar] = useState("https://via.placeholder.com/150"); // Placeholder avatar
+  const { data: session } useSession();
+  const userName = data.user?.firstName | "";
+  const [avatar, setAvatar] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
-
-  const session = {
-    user: {
-      email: "",
-      firstName: "",
-      lastName: "",
-      age: "",
-      gender: "",
-      avatarUrl: avatar,
-    },
-  };
 
   const userData = session?.user || {
     email: "example@example.com",
@@ -78,7 +67,6 @@ export default function Profile() {
   const onSubmit = (data) => {
     // Handle form submission (e.g., save changes)
     console.log("Form submitted", data);
-    // Add logic to handle avatar upload if needed
   };
 
   const handleFileChange = (event) => {
@@ -90,12 +78,12 @@ export default function Profile() {
   };
 
   const removeImage = () => {
-    setAvatar("https://via.placeholder.com/150"); // Reset to placeholder
+    setAvatar("");
     setSelectedFile(null);
   };
 
   return (
-    <Box width="full" mt={8}>
+    <Box width="full">
       <Card
         bgImage="url('https://images.unsplash.com/photo-1602536052359-ef94c21c5948?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')"
         bgSize="cover"
@@ -103,15 +91,18 @@ export default function Profile() {
         p={8}
       >
         <Flex alignItems="center" gap={4}>
-          <Image
+          {/* <Image
             src={selectedFile || avatar}
             alt="Profile Image"
             rounded="full"
+            blur="2px"
             borderRadius="full"
             boxSize="150px"
+            backdropBlur="2px"
             mb={4}
             objectFit="cover"
-          />
+          /> */}
+          <Avater size='2xl' name={userData} src={avatar} />
           <FormControl>
             <FormLabel htmlFor="avatar">
               <MdPerson /> Profile Image
@@ -135,25 +126,18 @@ export default function Profile() {
           </Box>
         </Flex>
       </Card>
+
       <Box p={6}>
         <Text fontSize="2xl" fontWeight="bold" mb={6}>
           Profile Settings
         </Text>
-        <Flex
-          width="full"
-          justifyContent="space-between"
-          paddingX={6}
-          paddingY={8}
-        >
-          <VStack width="100vw">
+
+        <Flex gap={8} px={6} py={8}>
+          <Box flex="3">
             <Card borderRadius="md" p={6}>
-              <Stack spacing={4} align="center">
+              <Stack spacing={4}>
                 <form onSubmit={handleSubmit(onSubmit)}>
-                  <Stack
-                    direction={{ base: "column", md: "row" }}
-                    width="full"
-                    gap={4}
-                  >
+                  <Stack direction={{ base: "column", md: "row" }} gap={4}>
                     <FormControl isInvalid={!!errors.firstName} flex="1">
                       <FormLabel htmlFor="firstName">
                         <MdPerson /> First Name
@@ -217,11 +201,9 @@ export default function Profile() {
                     </FormControl>
                   </Stack>
 
-                  {/* Image Upload Section */}
-
                   <Button
                     colorScheme="red"
-                    className="w-full mt-2"
+                    mt={4}
                     onClick={removeImage}
                     leftIcon={<MdDelete />}
                     isDisabled={!selectedFile}
@@ -231,61 +213,60 @@ export default function Profile() {
 
                   <Button
                     colorScheme="teal"
-                    className="w-full"
-                    borderRadius="md"
                     mt={4}
                     type="submit"
+                    width="full"
+                    borderRadius="md"
                   >
                     Save Changes
                   </Button>
                 </form>
               </Stack>
             </Card>
-            <VStack>
-              <Card
-                shadow="lg"
-                borderRadius="md"
-                className="p-6 w-full md:w-1/2 lg:w-1/3 mt-8"
-              >
-                <Stack spacing={4}>
-                  <Text fontSize="2xl" fontWeight="bold" textAlign="center">
-                    Change Password
-                  </Text>
-                  <FormControl>
-                    <FormLabel htmlFor="newPassword">
-                      <MdLock /> New Password
-                    </FormLabel>
-                    <Input
-                      id="newPassword"
-                      type="password"
-                      placeholder="Enter new password"
-                      borderColor="gray.300"
-                    />
-                  </FormControl>
+          </Box>
 
-                  <FormControl>
-                    <FormLabel htmlFor="confirmPassword">
-                      <MdLock /> Confirm Password
-                    </FormLabel>
-                    <Input
-                      id="confirmPassword"
-                      type="password"
-                      placeholder="Confirm new password"
-                      borderColor="gray.300"
-                    />
-                  </FormControl>
+          {/* Password section - 40% width */}
+          <Box flex="2">
+            <Card borderRadius="md" p={6} shadow="lg">
+              <Stack spacing={4}>
+                <Text fontSize="2xl" fontWeight="bold" textAlign="center">
+                  Change Password
+                </Text>
+                <FormControl>
+                  <FormLabel htmlFor="newPassword">
+                    <MdLock /> New Password
+                  </FormLabel>
+                  <Input
+                    id="newPassword"
+                    type="password"
+                    placeholder="Enter new password"
+                    borderColor="gray.300"
+                  />
+                </FormControl>
 
-                  <Button
-                    colorScheme="blue"
-                    className="w-full"
-                    borderRadius="md"
-                  >
-                    Update Password
-                  </Button>
-                </Stack>
-              </Card>
-            </VStack>
-          </VStack>
+                <FormControl>
+                  <FormLabel htmlFor="confirmPassword">
+                    <MdLock /> Confirm Password
+                  </FormLabel>
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    placeholder="Confirm new password"
+                    borderColor="gray.300"
+                  />
+                </FormControl>
+
+                <Button
+                  colorScheme="blue"
+                  width="full"
+                  borderRadius="md"
+                  mt={4}
+                >
+                  Update Password
+                </Button>
+              </Stack>
+            </Card>
+          </Box>
         </Flex>
       </Box>
     </Box>

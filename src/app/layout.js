@@ -19,12 +19,11 @@ export default function RootLayout({ children }) {
       <Provider store={store}>
         <ChakraProvider>
           <Analytics />
-          <body className={``}>
+          <body>
             <Navbar />
-            <Box className={`mt-4 border border-red-500`} bgColor="gray.100">
+            <Box pt="60px" bgColor="gray.100">
               {children}
             </Box>
-            {/*<Footer />*/}
           </body>
         </ChakraProvider>
       </Provider>
