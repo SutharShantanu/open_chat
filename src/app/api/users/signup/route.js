@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import connectDB from "../../../../lib/mongoDB";
 import User from "../../../../models/user";
 import bcrypt from "bcryptjs";
-import sendEmail from "../../../../lib/sendEmail"; // Assume this is your email sending function
-import crypto from "crypto"; // For generating the OTP
+import sendEmail from "@/app/lib/nodemailer";
+import CryptoJS from "crypto-js";
 
 export const POST = async (request) => {
   await connectDB();
@@ -28,21 +28,16 @@ export const POST = async (request) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    const otp = Math.floor(1000 + Math.random() * 9000).toString(); 
+
     const newUser = new User({
       email,
       password: hashedPassword,
       firstName,
       lastName,
-      verificationToken: crypto.randomInt(1000, 9999).toString(), // Generate a 4-digit OTP
+      verificationToken: otp,
     });
     await newUser.save();
-
-    // Send the OTP to the user's email
-    await sendEmail({
-      to: email,
-      subject: "Your OTP for Email Verification",
-      text: `Your OTP is ${newUser.verificationToken}. Please verify your email.`,
-    });
 
     return NextResponse.json(
       {

@@ -22,7 +22,7 @@ import {
 } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
-import LoginUser from "./Modals/LoginUser";
+import LoginUser from "./Modals/ProfileImage";
 import { VscDebugPause } from "react-icons/vsc";
 
 const Navbar = () => {

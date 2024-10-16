@@ -13,6 +13,7 @@ import {
   Stack,
   Box,
   IconButton,
+  useDisclosure,
 } from "@chakra-ui/react";
 import {
   MdEmail,
@@ -54,10 +55,7 @@ const userData = {
 export default function Profile() {
   const [avatar, setAvatar] = useState(userData.avatar || "");
   const [selectedFile, setSelectedFile] = useState(null);
-  const [isOpen, setIsOpen] = useState(false);
-
-  const openModal = () => setIsOpen(true);
-  const closeModal = () => setIsOpen(false);
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const {
     register,
     handleSubmit,
@@ -115,7 +113,7 @@ export default function Profile() {
               isRound={true}
               aria-label="edit profile"
               icon={<VscEdit />}
-              onClick={openModal}
+              onClick={onOpen}
             />
           </Box>
           <FormControl>
@@ -284,7 +282,7 @@ export default function Profile() {
           </Box>
         </Flex>
       </Box>
-      <ProfileImageModal isOpen={isOpen} closeModal={closeModal} />
+      <ProfileImageModal isOpen={isOpen} onClose={onClose} />
     </Box>
   );
 }
