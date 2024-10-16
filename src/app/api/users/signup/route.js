@@ -9,7 +9,10 @@ export const POST = async (request) => {
   await connectDB();
 
   try {
-    const { email, password, firstName, lastName } = await request.json();
+    const body = await request.json(); // Parse body
+    console.log("Received data:", body); // Debugging log
+
+    const { email, password, firstName, lastName } = body;
 
     if (!email || !password || !firstName || !lastName) {
       return NextResponse.json(
@@ -28,7 +31,7 @@ export const POST = async (request) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const otp = Math.floor(1000 + Math.random() * 9000).toString(); 
+    const otp = Math.floor(1000 + Math.random() * 9000).toString(); // Generate OTP
 
     const newUser = new User({
       email,
