@@ -21,6 +21,8 @@ import {
   Spinner,
   IconButton,
   useToast,
+  Box,
+  Divider,
 } from "@chakra-ui/react";
 
 const SignupSchema = z.object({
@@ -51,27 +53,29 @@ const SignupPage = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm({
     resolver: zodResolver(SignupSchema),
-    mode: "onChange", // Enables real-time validation
+    mode: "onChange",
   });
 
   const handleTogglePassword = () => setShowPassword(!showPassword);
 
   const onSubmit = async (formData) => {
+
     setIsLoading(true);
+    console.log(formData)
     try {
-      const response = await axios.post("/api/auth/signup", formData);
+      const response = await axios.post("/api/users/signup", formData);
       if (response.status === 201) {
         toast({
-          title: "Signup successful!",
+          title: "User Account Created",
           description: "Redirecting to login...",
           status: "success",
           duration: 3000,
           isClosable: true,
         });
-        router.push("/login");
+        router.push("/verify");
       }
     } catch (err) {
       toast({
@@ -197,11 +201,36 @@ const SignupPage = () => {
             rounded="none"
             bgColor="black"
             color="white"
-            _hover={{ bgColor: "gray.800" }}
+            border="1px solid transparent"
+            _hover={{
+              bgColor: "white",
+              color: "black",
+              borderColor: "black",
+            }}
             isLoading={isLoading}
             spinner={<Spinner color="white" size="xs" />}
+            isDisabled={!isValid || isLoading}
           >
             Sign Up
+          </Button>
+          <Box marginY="8">
+            <Divider position="relative" borderColor="gray" />
+            <Text position="absolute" left="49%" top="73%" bgColor="white" padding="2" color="black" rounded="full">OR</Text>
+          </Box>
+          <Button
+            size="md"
+            width="full"
+            rounded="none"
+            color="black"
+            bgColor="white"
+            border="1px solid black"
+            _hover={{
+              bgColor: "black",
+              color: "white"
+            }}
+            onClick={()=> router.push("/login")}
+          >
+            Login
           </Button>
         </form>
       </Flex>

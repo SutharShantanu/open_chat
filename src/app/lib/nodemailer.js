@@ -1,22 +1,37 @@
 import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST, // SMTP server host
-  port: process.env.SMTP_PORT, // SMTP server port
-  secure: process.env.SMTP_SECURE === "true", // true for 465, false for other ports
+  service: "gmail",
   auth: {
-    user: process.env.SMTP_USER, // Your email address
-    pass: process.env.SMTP_PASS, // Your email password or app password
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
   },
 });
 
-const sendEmail = async ({ to, subject, text }) => {
+const sendEmail = async ({ to, firstName, emailType, otp }) => {
+  let subject;
+  let text;
+
+  if (emailType === "VERIFY") {
+    subject = "Verify your email address";
+    text = `Hello ${firstName},
+
+    Thank you for registering! Please verify your email address by using the following OTP:
+
+    OTP: ${otp}
+
+    If you did not request this verification, please ignore this email.
+
+    Best regards,
+    Your Team`;
+  }
+
   try {
     await transporter.sendMail({
-      from: process.env.SMTP_USER, // sender address
-      to, // list of receivers
-      subject, // Subject line
-      text, // plain text body
+      from: process.env.SMTP_USER,
+      to,
+      subject,
+      text,
     });
     console.log("Email sent successfully to:", to);
   } catch (error) {

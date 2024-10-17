@@ -1,17 +1,14 @@
 import { NextResponse } from "next/server";
-import connectDB from "../../../../lib/mongoDB";
-import User from "../../../../models/user";
+import connectDB from "@/app/lib/mongoDB";
+import User from "@/app/models/Users";
 import bcrypt from "bcryptjs";
 import sendEmail from "@/app/lib/nodemailer";
-import CryptoJS from "crypto-js";
 
 export const POST = async (request) => {
   await connectDB();
 
   try {
-    const body = await request.json(); // Parse body
-    console.log("Received data:", body); // Debugging log
-
+    const body = await request.json();
     const { email, password, firstName, lastName } = body;
 
     if (!email || !password || !firstName || !lastName) {
@@ -31,7 +28,7 @@ export const POST = async (request) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const otp = Math.floor(1000 + Math.random() * 9000).toString(); // Generate OTP
+    const otp = Math.floor(1000 + Math.random() * 9000).toString();
 
     const newUser = new User({
       email,
@@ -41,6 +38,13 @@ export const POST = async (request) => {
       verificationToken: otp,
     });
     await newUser.save();
+
+    await sendEmail({
+      to: email,
+      firstName,
+      emailType: "VERIFY",
+      otp,
+    });
 
     return NextResponse.json(
       {
