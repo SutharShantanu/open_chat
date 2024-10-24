@@ -1,4 +1,8 @@
 import { NextResponse } from "next/server";
+import connectDB from "@/app/lib/mongoDB";
+import User from "@/app/models/Users";
+import bcrypt from "bcryptjs";
+import sendEmail from "@/app/lib/nodemailer";
 
 export const POST = async (request) => {
   await connectDB();
@@ -14,7 +18,6 @@ export const POST = async (request) => {
       );
     }
 
-    // Check if the OTP is correct
     if (user.verificationToken !== otp) {
       return NextResponse.json(
         { error: "Invalid OTP." },
@@ -22,9 +25,8 @@ export const POST = async (request) => {
       );
     }
 
-    // Update user's verification status
     user.isVerified = true;
-    user.verificationToken = null; // Clear the OTP after verification
+    user.verificationToken = null;
     await user.save();
 
     return NextResponse.json(
@@ -34,6 +36,7 @@ export const POST = async (request) => {
       },
       { status: 200 }
     );
+
   } catch (error) {
     console.error("OTP verification error:", error.message);
     return NextResponse.json(

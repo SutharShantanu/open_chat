@@ -25,7 +25,7 @@ import {
   setIsConnected,
   setTransport,
   setSelectedRoom,
-} from "@/app/store/chatSlice";
+} from "@/app/store/slices/chatSlice";
 
 let socket;
 

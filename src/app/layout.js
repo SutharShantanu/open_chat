@@ -5,8 +5,9 @@ import { Analytics } from "@vercel/analytics/react";
 import Navbar from "@/app/components/Navbar";
 // import Footer from "./components/Footer";
 import { Box, ChakraProvider } from "@chakra-ui/react";
-import { store } from "./store";
+import { store , persistor } from "./store";
 import { Provider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
 
 // export const metadata = {
 //     title: "Create Next App",
@@ -17,6 +18,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
         <ChakraProvider>
           <Analytics />
           <body>
@@ -26,6 +28,7 @@ export default function RootLayout({ children }) {
             </Box>
           </body>
         </ChakraProvider>
+        </PersistGate>
       </Provider>
     </html>
   );

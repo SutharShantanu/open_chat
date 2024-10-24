@@ -13,10 +13,13 @@ import {
   PinInputField,
   HStack,
   Spinner,
+  useToast,
 } from "@chakra-ui/react";
 import * as z from "zod";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
 
-// Zod schema for OTP validation
 const otpSchema = z
   .string()
   .length(4, { message: "OTP must be exactly 4 digits." });
@@ -24,34 +27,67 @@ const otpSchema = z
 const VerifyEmail = () => {
   const [otp, setOtp] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [resendTimer, setResendTimer] = useState(30); // Timer for resend button
-  const [error, setError] = useState(""); // State to hold validation error
+  const [resendTimer, setResendTimer] = useState(30);
+  const email = useSelector((state) => state.user.userInfo.email);
+  const [error, setError] = useState("");
+  const toast = useToast();
+  const router = useRouter();
 
-  // Handle OTP verification
   const handleSubmit = async () => {
-    // Clear previous error
     setError("");
 
-    // Validate OTP using Zod schema
     const result = otpSchema.safeParse(otp);
 
     if (!result.success) {
-      // If validation fails, display the error message
       setError(result.error.errors[0].message);
       return;
     }
 
     setIsSubmitting(true);
-    // Simulate an API call to verify OTP
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log(`Verifying OTP: ${otp}`);
-    setIsSubmitting(false);
+    try {
+      const response = await axios.post("/api/users/verify", {
+        email: email,
+        otp: otp,
+      });
+
+      const data = response.data;
+
+      if (response.status === 200 || response.status === 201) {
+        toast({
+          title: "User Verified",
+          description: "Redirecting to dashboard",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+        router.push("/dashboard");
+      } else {
+        setError(data.error || "Something went wrong.");
+        toast({
+          title: "Error",
+          description: data.error || "Something went wrong.",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    } catch (error) {
+      const errorMessage = error.response?.data?.error || "An error occurred while verifying the OTP.";
+      setError(errorMessage);
+      toast({
+        title: "Error",
+        description: errorMessage,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  // Handle Resend OTP
   const handleResendOtp = async () => {
-    setResendTimer(30); // Reset the timer
-    // Simulate an API call to resend OTP
+    setResendTimer(30);
     await new Promise((resolve) => setTimeout(resolve, 1000));
     console.log("Resending OTP");
   };
@@ -82,7 +118,7 @@ const VerifyEmail = () => {
               <PinInput
                 otp
                 size="md"
-                onComplete={(value) => setOtp(value)} // Set OTP after all fields are filled
+                onComplete={(value) => setOtp(value)}
                 isDisabled={isSubmitting}
               >
                 <PinInputField
@@ -103,8 +139,7 @@ const VerifyEmail = () => {
                 />
               </PinInput>
             </HStack>
-            {error && <Text color="red.500">{error}</Text>}{" "}
-            {/* Display error */}
+            {error && <Text color="red.500" fontSize="sm">{error}</Text>}
           </FormControl>
 
           <Button
