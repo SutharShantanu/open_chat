@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/app/lib/mongoDB";
 import User from "@/app/models/Users";
-import bcrypt from "bcryptjs";
-import sendEmail from "@/app/lib/nodemailer";
+import { signIn } from "next-auth/react";
 
 export const POST = async (request) => {
   await connectDB();
@@ -29,10 +28,17 @@ export const POST = async (request) => {
     user.verificationToken = null;
     await user.save();
 
+    const token = signIn(
+      { id: user._id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
     return NextResponse.json(
       {
         message: "Email verified successfully.",
         success: true,
+        token,
       },
       { status: 200 }
     );

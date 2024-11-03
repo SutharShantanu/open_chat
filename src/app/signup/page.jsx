@@ -101,12 +101,11 @@ const SignupPage = () => {
   };
 
   return (
-    <Flex align="center" justify="center" height="100vh" p={4} bg="white">
+    <Flex align="center" justify="center" height="100vh" p={4} bg="gray.100">
       <Flex
         direction="column"
         bg="white"
         p={8}
-        border="1px solid black"
         rounded="none"
         maxWidth="md"
         width="100%"
@@ -219,9 +218,10 @@ const SignupPage = () => {
           >
             Sign Up
           </Button>
-          <Box marginY="8">
-            <Divider position="relative" borderColor="gray" />
-            <Text position="absolute" left="49%" top="73%" bgColor="white" padding="2" color="black" rounded="full">OR</Text>
+          <Box display="flex" alignItems="center" my={4}>
+              <Box flex="1" height="1px" bg="gray.300" />
+              <Text mx={3} userSelect="none" color="gray.500">OR</Text>
+              <Box flex="1" height="1px" bg="gray.300" />
           </Box>
           <Button
             size="md"
