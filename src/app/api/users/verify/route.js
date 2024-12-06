@@ -1,7 +1,4 @@
 import { NextResponse } from "next/server";
-import connectDB from "@/app/lib/mongoDB";
-import User from "@/app/models/Users";
-import { signIn } from "next-auth/react";
 
 export const POST = async (request) => {
   await connectDB();
@@ -17,6 +14,7 @@ export const POST = async (request) => {
       );
     }
 
+    // Check if the OTP is correct
     if (user.verificationToken !== otp) {
       return NextResponse.json(
         { error: "Invalid OTP." },
@@ -24,25 +22,18 @@ export const POST = async (request) => {
       );
     }
 
+    // Update user's verification status
     user.isVerified = true;
-    user.verificationToken = null;
+    user.verificationToken = null; // Clear the OTP after verification
     await user.save();
-
-    const token = signIn(
-      { id: user._id, email: user.email },
-      process.env.JWT_SECRET,
-      { expiresIn: "1h" }
-    );
 
     return NextResponse.json(
       {
         message: "Email verified successfully.",
         success: true,
-        token,
       },
       { status: 200 }
     );
-
   } catch (error) {
     console.error("OTP verification error:", error.message);
     return NextResponse.json(

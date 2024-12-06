@@ -14,6 +14,10 @@ import {
   Box,
   IconButton,
   useDisclosure,
+  Spinner,
+  RadioGroup,
+  Radio,
+  HStack,
 } from "@chakra-ui/react";
 import {
   MdEmail,
@@ -55,6 +59,7 @@ const userData = {
 export default function Profile() {
   const [avatar, setAvatar] = useState(userData.avatar || "");
   const [selectedFile, setSelectedFile] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const {
     register,
@@ -66,6 +71,7 @@ export default function Profile() {
   });
 
   const onSubmit = (data) => {
+    // setIsLoading={true}
     console.log("Form submitted", data);
   };
 
@@ -90,35 +96,40 @@ export default function Profile() {
         bgPosition="center"
         p={8}
       >
-        <Flex alignItems="center" gap={4}>
-          {/* <Image
-            src={selectedFile || avatar}
-            alt="Profile Image"
-            rounded="full"
-            borderRadius="full"
-            boxSize="150px"
-            mb={4}
-            objectFit="cover"
-          /> */}
-          <Box position="relative">
+        <Flex
+          direction={{ base: "column", md: "row" }}
+          alignItems={{ base: "flex-start", md: "center" }}
+          gap={4}
+          p={2}
+          bgColor="white"
+          opacity={0.9}
+          borderRadius="md"
+        >
+          <Box position="relative" textAlign="center">
             <Avatar
               size="2xl"
               name={`${userData.firstName} ${userData.lastName}`}
               src={avatar}
             />
             <IconButton
-              right="0"
+              right="1"
               bottom="1"
               position="absolute"
-              isRound={true}
+              isRound
+              p={1}
               aria-label="edit profile"
               icon={<VscEdit />}
               onClick={onOpen}
             />
           </Box>
           <FormControl>
-            <FormLabel htmlFor="avatar">
-              <MdPerson /> Profile Image
+            <FormLabel
+              htmlFor="avatar"
+              display="flex"
+              alignItems="center"
+              gap={2}
+            >
+              <MdPerson style={{ opacity: 0.6 }} /> Profile Image
             </FormLabel>
             <Input
               type="file"
@@ -126,39 +137,65 @@ export default function Profile() {
               accept="image/*"
               onChange={handleFileChange}
               borderColor="gray.300"
+              rounded="none"
+              _focusVisible={{ outline: "none" }}
             />
           </FormControl>
-          <Text fontSize="lg" fontWeight="medium">
-            {`${userData.firstName} ${userData.lastName}`}
-          </Text>
-          <Box>
-            <MdEmail /> Email
-            <Text placeholder="Email" borderColor="gray.300" bg="gray.50">
-              {userData.email}
+          <Box textAlign={{ base: "center", md: "left" }}>
+            <Text fontSize="lg" fontWeight="medium">
+              {`${userData.firstName} ${userData.lastName}`}
             </Text>
+            <Box mt={2}>
+              <Text display="flex" alignItems="center" gap={2}>
+                <MdEmail style={{ opacity: 0.6 }} /> Email
+              </Text>
+              <Text
+                placeholder="Email"
+                borderColor="gray.300"
+                bg="gray.50"
+                p={1}
+                borderRadius="md"
+              >
+                {userData.email}
+              </Text>
+            </Box>
           </Box>
         </Flex>
       </Card>
-
       <Box p={6}>
-        <Text fontSize="2xl" fontWeight="bold" mb={6}>
+        <Text fontSize="2xl" fontWeight="bold" mb={{ base: 0, md: 6 }}>
           Profile Settings
         </Text>
 
-        <Flex gap={8} px={6} py={8}>
-          <Box flex="3">
+        <Flex
+          gap={8}
+          px={6}
+          py={8}
+          direction={{ base: "column", md: "row" }}
+          alignItems={{ base: "flex-start", md: "center" }}
+        >
+          <Box flex="3" width={{ base: "100%", md: "50%" }}>
             <Card borderRadius="md" p={6}>
               <Stack spacing={4}>
                 <form onSubmit={handleSubmit(onSubmit)}>
                   <Stack direction={{ base: "column", md: "row" }} gap={4}>
                     <FormControl isInvalid={!!errors.firstName} flex="1">
-                      <FormLabel htmlFor="firstName">
-                        <MdPerson /> First Name
+                      <FormLabel
+                        htmlFor="firstName"
+                        display="flex"
+                        alignItems="center"
+                        gap={2}
+                        fontWeight="normal"
+                        color="gray.600"
+                      >
+                        <MdPerson color="gray.500" /> First Name
                       </FormLabel>
                       <Input
                         id="firstName"
                         placeholder="Enter your first name"
                         borderColor="gray.300"
+                        rounded="none"
+                        _focusVisible={{ outline: "none" }}
                         {...register("firstName")}
                       />
                       <FormErrorMessage>
@@ -167,13 +204,22 @@ export default function Profile() {
                     </FormControl>
 
                     <FormControl isInvalid={!!errors.lastName} flex="1">
-                      <FormLabel htmlFor="lastName">
-                        <MdPerson /> Last Name
+                      <FormLabel
+                        htmlFor="lastName"
+                        display="flex"
+                        alignItems="center"
+                        gap={2}
+                        fontWeight="normal"
+                        color="gray.600"
+                      >
+                        <MdPerson color="gray.500" /> Last Name
                       </FormLabel>
                       <Input
                         id="lastName"
                         placeholder="Enter your last name"
                         borderColor="gray.300"
+                        rounded="none"
+                        _focusVisible={{ outline: "none" }}
                         {...register("lastName")}
                       />
                       <FormErrorMessage>
@@ -182,14 +228,23 @@ export default function Profile() {
                     </FormControl>
 
                     <FormControl isInvalid={!!errors.age} flex="1">
-                      <FormLabel htmlFor="age">
-                        <MdCake /> Age
+                      <FormLabel
+                        htmlFor="age"
+                        display="flex"
+                        alignItems="center"
+                        gap={2}
+                        fontWeight="normal"
+                        color="gray.600"
+                      >
+                        <MdCake color="gray.500" /> Age
                       </FormLabel>
                       <Input
                         id="age"
                         type="number"
                         placeholder="Enter your age"
                         borderColor="gray.300"
+                        rounded="none"
+                        _focusVisible={{ outline: "none" }}
                         {...register("age")}
                       />
                       <FormErrorMessage>
@@ -198,16 +253,31 @@ export default function Profile() {
                     </FormControl>
 
                     <FormControl isInvalid={!!errors.gender} flex="1">
-                      <FormLabel htmlFor="gender">
-                        {userData.gender === "Male" ? <MdMale /> : <MdFemale />}{" "}
-                        Gender
-                      </FormLabel>
-                      <Input
-                        id="gender"
-                        placeholder="Enter your gender"
-                        borderColor="gray.300"
-                        {...register("gender")}
-                      />
+                      <FormLabel htmlFor="gender">Gender</FormLabel>
+                      <RadioGroup id="gender" {...register("gender")}>
+                        <HStack spacing={4}>
+                          <Radio
+                            value="Male"
+                            display="flex"
+                            alignItems="center"
+                          >
+                            <MdMale
+                              style={{ marginRight: "8px", fontSize: "1.5rem" }}
+                            />
+                            Male
+                          </Radio>
+                          <Radio
+                            value="Female"
+                            display="flex"
+                            alignItems="center"
+                          >
+                            <MdFemale
+                              style={{ marginRight: "8px", fontSize: "1.5rem" }}
+                            />
+                            Female
+                          </Radio>
+                        </HStack>
+                      </RadioGroup>
                       <FormErrorMessage>
                         {errors.gender && errors.gender.message}
                       </FormErrorMessage>
@@ -215,7 +285,15 @@ export default function Profile() {
                   </Stack>
 
                   <Button
-                    colorScheme="red"
+                    size="md"
+                    color="white"
+                    bgColor="red.300"
+                    rounded="none"
+                    border="1px solid red.300"
+                    _hover={{ bgColor: "red.500", color: "white" }}
+                    isLoading={isLoading}
+                    loadingText="Removing"
+                    spinner={<Spinner color="white" size="xs" />}
                     mt={4}
                     onClick={removeImage}
                     leftIcon={<MdDelete />}
@@ -225,11 +303,18 @@ export default function Profile() {
                   </Button>
 
                   <Button
-                    colorScheme="teal"
+                    size="md"
+                    color="white"
+                    bgColor="black"
+                    rounded="none"
+                    border="1px solid black"
+                    _hover={{ bgColor: "black", color: "white" }}
+                    isLoading={isLoading}
+                    loadingText="Saving"
+                    spinner={<Spinner color="white" size="xs" />}
                     mt={4}
                     type="submit"
                     width="full"
-                    borderRadius="md"
                   >
                     Save Changes
                   </Button>
@@ -238,51 +323,50 @@ export default function Profile() {
             </Card>
           </Box>
 
-          {/* Password section - 40% width */}
-          <Box flex="2">
+          <Box flex="2" width={{ base: "100%", md: "50%" }}>
             <Card borderRadius="md" p={6} shadow="lg">
               <Stack spacing={4}>
                 <Text fontSize="2xl" fontWeight="bold" textAlign="center">
                   Change Password
                 </Text>
-                <FormControl>
-                  <FormLabel htmlFor="newPassword">
-                    <MdLock /> New Password
-                  </FormLabel>
-                  <Input
-                    id="newPassword"
-                    type="password"
-                    placeholder="Enter new password"
-                    borderColor="gray.300"
-                  />
-                </FormControl>
+                <Flex direction="column" gap={4}>
+                  <FormControl isInvalid={!!errors.password}>
+                    <FormLabel htmlFor="password">
+                      <MdLock style={{ opacity: 0.6 }} /> New Password
+                    </FormLabel>
+                    <Input
+                      id="password"
+                      type="password"
+                      placeholder="Enter your new password"
+                      borderColor="gray.300"
+                      rounded="none"
+                      _focusVisible={{ outline: "none" }}
+                    />
+                    <FormErrorMessage>
+                      {errors.password && errors.password.message}
+                    </FormErrorMessage>
+                  </FormControl>
 
-                <FormControl>
-                  <FormLabel htmlFor="confirmPassword">
-                    <MdLock /> Confirm Password
-                  </FormLabel>
-                  <Input
-                    id="confirmPassword"
-                    type="password"
-                    placeholder="Confirm new password"
-                    borderColor="gray.300"
-                  />
-                </FormControl>
-
-                <Button
-                  colorScheme="blue"
-                  width="full"
-                  borderRadius="md"
-                  mt={4}
-                >
-                  Update Password
-                </Button>
+                  <Button
+                    colorScheme="blue"
+                    mt={4}
+                    width="full"
+                    borderRadius="md"
+                  >
+                    Change Password
+                  </Button>
+                </Flex>
               </Stack>
             </Card>
           </Box>
         </Flex>
       </Box>
-      <ProfileImageModal isOpen={isOpen} onClose={onClose} />
+
+      <ProfileImageModal
+        isOpen={isOpen}
+        onClose={onClose}
+        onSelect={setAvatar}
+      />
     </Box>
   );
 }

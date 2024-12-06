@@ -24,8 +24,6 @@ import {
   Box,
   Divider,
 } from "@chakra-ui/react";
-import { useDispatch } from "react-redux";
-import { setUserInfo } from "../store/slices/userSlice";
 
 const SignupSchema = z.object({
   firstName: z
@@ -51,7 +49,6 @@ const SignupPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const toast = useToast();
   const router = useRouter();
-  const dispatch = useDispatch();
 
   const {
     register,
@@ -70,14 +67,7 @@ const SignupPage = () => {
     console.log(formData)
     try {
       const response = await axios.post("/api/users/signup", formData);
-      if (response.status === 201 || response.ok) {
-        dispatch(
-          setUserInfo({
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            email: formData.email,
-          })
-        );
+      if (response.status === 201) {
         toast({
           title: "User Account Created",
           description: "Redirecting to login...",
@@ -101,11 +91,12 @@ const SignupPage = () => {
   };
 
   return (
-    <Flex align="center" justify="center" height="100vh" p={4} bg="gray.100">
+    <Flex align="center" justify="center" height="100vh" p={4} bg="white">
       <Flex
         direction="column"
         bg="white"
         p={8}
+        border="1px solid black"
         rounded="none"
         maxWidth="md"
         width="100%"
@@ -115,6 +106,7 @@ const SignupPage = () => {
         </Text>
 
         <form onSubmit={handleSubmit(onSubmit)}>
+          {/* First Name */}
           <FormControl mb={4} isInvalid={errors.firstName}>
             <FormLabel>First Name</FormLabel>
             <Input
@@ -131,6 +123,7 @@ const SignupPage = () => {
             )}
           </FormControl>
 
+          {/* Last Name */}
           <FormControl mb={4} isInvalid={errors.lastName}>
             <FormLabel>Last Name</FormLabel>
             <Input
@@ -147,6 +140,7 @@ const SignupPage = () => {
             )}
           </FormControl>
 
+          {/* Email */}
           <FormControl mb={4} isInvalid={errors.email}>
             <FormLabel>Email address</FormLabel>
             <InputGroup>
@@ -168,6 +162,7 @@ const SignupPage = () => {
             )}
           </FormControl>
 
+          {/* Password */}
           <FormControl mb={4} isInvalid={errors.password}>
             <FormLabel>Password</FormLabel>
             <InputGroup>
@@ -218,10 +213,9 @@ const SignupPage = () => {
           >
             Sign Up
           </Button>
-          <Box display="flex" alignItems="center" my={4}>
-              <Box flex="1" height="1px" bg="gray.300" />
-              <Text mx={3} userSelect="none" color="gray.500">OR</Text>
-              <Box flex="1" height="1px" bg="gray.300" />
+          <Box marginY="8">
+            <Divider position="relative" borderColor="gray" />
+            <Text position="absolute" left="49%" top="73%" bgColor="white" padding="2" color="black" rounded="full">OR</Text>
           </Box>
           <Button
             size="md"
@@ -234,7 +228,7 @@ const SignupPage = () => {
               bgColor: "black",
               color: "white"
             }}
-            onClick={() => router.push("/login")}
+            onClick={()=> router.push("/login")}
           >
             Login
           </Button>
