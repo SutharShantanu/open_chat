@@ -62,9 +62,8 @@ const SignupPage = () => {
   const handleTogglePassword = () => setShowPassword(!showPassword);
 
   const onSubmit = async (formData) => {
-
     setIsLoading(true);
-    console.log(formData)
+    console.log(formData);
     try {
       const response = await axios.post("/api/users/signup", formData);
       if (response.status === 201) {
@@ -96,10 +95,11 @@ const SignupPage = () => {
         direction="column"
         bg="white"
         p={8}
-        border="1px solid black"
-        rounded="none"
+        rounded="sm"
         maxWidth="md"
         width="100%"
+        minHeight="614px"
+        bgColor="gray.100"
       >
         <Text fontSize="2xl" mb={4} textAlign="center">
           Sign Up
@@ -112,7 +112,7 @@ const SignupPage = () => {
             <Input
               type="text"
               placeholder="Enter your first name"
-              rounded="none"
+              rounded="sm"
               {...register("firstName")}
               _focusVisible={{ outline: "none" }}
             />
@@ -129,7 +129,7 @@ const SignupPage = () => {
             <Input
               type="text"
               placeholder="Enter your last name"
-              rounded="none"
+              rounded="sm"
               {...register("lastName")}
               _focusVisible={{ outline: "none" }}
             />
@@ -150,7 +150,7 @@ const SignupPage = () => {
               <Input
                 type="email"
                 placeholder="Email address"
-                rounded="none"
+                rounded="sm"
                 {...register("email")}
                 _focusVisible={{ outline: "none" }}
               />
@@ -169,7 +169,7 @@ const SignupPage = () => {
               <Input
                 type={showPassword ? "text" : "password"}
                 placeholder="Enter your password"
-                rounded="none"
+                rounded="sm"
                 {...register("password")}
                 _focusVisible={{ outline: "none" }}
               />
@@ -177,7 +177,7 @@ const SignupPage = () => {
                 <IconButton
                   h="1.75rem"
                   size="sm"
-                  rounded="none"
+                  rounded="sm"
                   onClick={handleTogglePassword}
                   icon={showPassword ? <VscEyeClosed /> : <VscEye />}
                   bgColor="black"
@@ -197,38 +197,43 @@ const SignupPage = () => {
             type="submit"
             size="md"
             width="full"
-            mt={4}
-            rounded="none"
-            bgColor="black"
+            rounded="sm"
             color="white"
-            border="1px solid transparent"
-            _hover={{
-              bgColor: "white",
-              color: "black",
-              borderColor: "black",
-            }}
+            bgColor="gray.900"
+            mt={4}
+            _hover={
+              isValid && !isLoading && { bgColor: "gray.700", color: "white" }
+            }
             isLoading={isLoading}
             spinner={<Spinner color="white" size="xs" />}
             isDisabled={!isValid || isLoading}
           >
             Sign Up
           </Button>
-          <Box marginY="8">
-            <Divider position="relative" borderColor="gray" />
-            <Text position="absolute" left="49%" top="73%" bgColor="white" padding="2" color="black" rounded="full">OR</Text>
+          <Box marginY="2" display="flex" alignItems="center">
+            <Divider flex="1" borderColor="gray" />
+            <Text
+              marginX="2"
+              bgColor="white"
+              color="gray"
+              padding="1"
+              rounded="sm"
+            >
+              OR
+            </Text>
+            <Divider flex="1" borderColor="gray" />
           </Box>
           <Button
             size="md"
             width="full"
-            rounded="none"
-            color="black"
-            bgColor="white"
-            border="1px solid black"
+            rounded="sm"
+            color="white"
+            bgColor="gray.900"
             _hover={{
-              bgColor: "black",
-              color: "white"
+              bgColor: "gray.700",
+              color: "white",
             }}
-            onClick={()=> router.push("/login")}
+            onClick={() => router.push("/login")}
           >
             Login
           </Button>
