@@ -8,13 +8,13 @@ export default function AuthButtons() {
   return (
     <HStack spacing={4} width="100%" justify="center">
       <Button
-        leftIcon={<FaGithub/>}
+        leftIcon={<FaGithub />}
         onClick={() => signIn("github", { callbackUrl: "/" })}
         width="full"
         colorScheme="blackAlpha"
         variant="solid"
         padding={4}
-        rounded="none"
+        rounded="sm"
         border="1px solid gray.300"
       >
         Continue with GitHub
@@ -26,7 +26,7 @@ export default function AuthButtons() {
         colorScheme="red"
         variant="solid"
         padding={4}
-        rounded="none"
+        rounded="sm"
         border="1px solid red"
       >
         Continue with Google

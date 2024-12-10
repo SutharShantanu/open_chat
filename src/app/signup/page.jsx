@@ -90,7 +90,13 @@ const SignupPage = () => {
   };
 
   return (
-    <Flex align="center" justify="center" height="100vh" p={4} bg="white">
+    <Flex
+      align="center"
+      justify="center"
+      p={4}
+      bg="white"
+      sx={{ height: "calc(100vh - 60px)" }}
+    >
       <Flex
         direction="column"
         bg="white"
@@ -99,14 +105,11 @@ const SignupPage = () => {
         maxWidth="md"
         width="100%"
         minHeight="614px"
-        bgColor="gray.100"
       >
         <Text fontSize="2xl" mb={4} textAlign="center">
           Sign Up
         </Text>
-
         <form onSubmit={handleSubmit(onSubmit)}>
-          {/* First Name */}
           <FormControl mb={4} isInvalid={errors.firstName}>
             <FormLabel>First Name</FormLabel>
             <Input
@@ -122,8 +125,6 @@ const SignupPage = () => {
               </Text>
             )}
           </FormControl>
-
-          {/* Last Name */}
           <FormControl mb={4} isInvalid={errors.lastName}>
             <FormLabel>Last Name</FormLabel>
             <Input
@@ -139,12 +140,10 @@ const SignupPage = () => {
               </Text>
             )}
           </FormControl>
-
-          {/* Email */}
           <FormControl mb={4} isInvalid={errors.email}>
             <FormLabel>Email address</FormLabel>
             <InputGroup>
-              <InputLeftElement pointerEvents="none">
+              <InputLeftElement pointerEvents="none" color="gray">
                 <MdOutlineAlternateEmail />
               </InputLeftElement>
               <Input
@@ -161,8 +160,6 @@ const SignupPage = () => {
               </Text>
             )}
           </FormControl>
-
-          {/* Password */}
           <FormControl mb={4} isInvalid={errors.password}>
             <FormLabel>Password</FormLabel>
             <InputGroup>
@@ -180,8 +177,8 @@ const SignupPage = () => {
                   rounded="sm"
                   onClick={handleTogglePassword}
                   icon={showPassword ? <VscEyeClosed /> : <VscEye />}
-                  bgColor="black"
-                  _hover={{ bgColor: "gray.600" }}
+                  bgColor="gray.900"
+                  _hover={{ bgColor: "gray.700" }}
                   color="white"
                 />
               </InputRightElement>
@@ -192,7 +189,6 @@ const SignupPage = () => {
               </Text>
             )}
           </FormControl>
-
           <Button
             type="submit"
             size="md"
@@ -208,13 +204,13 @@ const SignupPage = () => {
             spinner={<Spinner color="white" size="xs" />}
             isDisabled={!isValid || isLoading}
           >
-            Sign Up
+            {isLoading ? "Signing Up" : "Sign Up"}
           </Button>
-          <Box marginY="2" display="flex" alignItems="center">
+          <Box marginY="4" display="flex" alignItems="center">
             <Divider flex="1" borderColor="gray" />
             <Text
               marginX="2"
-              bgColor="white"
+              bgColor="transparent"
               color="gray"
               padding="1"
               rounded="sm"
