@@ -17,6 +17,7 @@ export const POST = async (request) => {
       );
     }
 
+    // Check if the OTP is correct
     if (user.verificationToken !== otp) {
       return NextResponse.json(
         { error: "Invalid OTP." },
@@ -24,8 +25,9 @@ export const POST = async (request) => {
       );
     }
 
+    // Update user's verification status
     user.isVerified = true;
-    user.verificationToken = null;
+    user.verificationToken = null; // Clear the OTP after verification
     await user.save();
 
     return NextResponse.json(

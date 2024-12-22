@@ -49,7 +49,6 @@ const SignupPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const toast = useToast();
   const router = useRouter();
-  const dispatch = useDispatch();
 
   const {
     register,

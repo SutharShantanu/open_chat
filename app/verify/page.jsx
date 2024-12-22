@@ -13,13 +13,10 @@ import {
   PinInputField,
   HStack,
   Spinner,
-  useToast,
 } from "@chakra-ui/react";
 import * as z from "zod";
-import axios from "axios";
-import { useRouter } from "next/navigation";
-import { useSelector } from "react-redux";
 
+// Zod schema for OTP validation
 const otpSchema = z
   .string()
   .length(4, { message: "OTP must be exactly 4 digits." });
@@ -27,18 +24,19 @@ const otpSchema = z
 const VerifyEmail = () => {
   const [otp, setOtp] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [resendTimer, setResendTimer] = useState(30);
-  const email = useSelector((state) => state.user.userInfo.email);
-  const [error, setError] = useState("");
-  const toast = useToast();
-  const router = useRouter();
+  const [resendTimer, setResendTimer] = useState(30); // Timer for resend button
+  const [error, setError] = useState(""); // State to hold validation error
 
+  // Handle OTP verification
   const handleSubmit = async () => {
+    // Clear previous error
     setError("");
 
+    // Validate OTP using Zod schema
     const result = otpSchema.safeParse(otp);
 
     if (!result.success) {
+      // If validation fails, display the error message
       setError(result.error.errors[0].message);
       return;
     }
@@ -84,6 +82,7 @@ const VerifyEmail = () => {
     }
   };
 
+  // Handle Resend OTP
   const handleResendOtp = async () => {
     setResendTimer(30);
     try {
@@ -144,7 +143,7 @@ const VerifyEmail = () => {
               <PinInput
                 otp
                 size="md"
-                onComplete={(value) => setOtp(value)}
+                onComplete={(value) => setOtp(value)} // Set OTP after all fields are filled
                 isDisabled={isSubmitting}
               >
                 <PinInputField
