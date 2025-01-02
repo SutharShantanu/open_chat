@@ -4,6 +4,7 @@ import User from "@/app/models/Users";
 import bcrypt from "bcryptjs";
 import sendEmail from "@/app/lib/nodemailer";
 import generateUniqueUsername from "@/app/api/components/generateUniqueUsername";
+import cloudinary from "@/app/lib/cloudinary";
 
 export const POST = async (request) => {
   await connectDB();
@@ -43,13 +44,15 @@ export const POST = async (request) => {
 
     const otp = Math.floor(1000 + Math.random() * 9000).toString();
 
+    const defaultProfileImageUrl = 'https://res.cloudinary.com/openchat07/image/upload/v1735818078/Users/profile/defaultprofile.svg';
+
     const newUser = new User({
       email,
       password: hashedPassword,
       firstName,
       lastName,
       verificationToken: otp,
-      profilePicture: "/Image/defaultProfile.svg",
+      profilePicture: defaultProfileImageUrl,
       username,
     });
     await newUser.save();

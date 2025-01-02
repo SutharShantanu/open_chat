@@ -13,6 +13,7 @@ import {
   PinInputField,
   HStack,
   Spinner,
+  useToast,
 } from "@chakra-ui/react";
 import * as z from "zod";
 
@@ -26,6 +27,7 @@ const VerifyEmail = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [resendTimer, setResendTimer] = useState(30); // Timer for resend button
   const [error, setError] = useState(""); // State to hold validation error
+  const toast = useToast();
 
   // Handle OTP verification
   const handleSubmit = async () => {
