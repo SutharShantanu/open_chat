@@ -4,7 +4,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import connectDB from "@/app/lib/mongoDB";
 import Users from "@/app/models/Users";
-import sendEmail from "../lib/nodemailer";
+import sendEmail from "@/app/lib/nodemailer";
 
 export const authOptions = {
   providers: [
@@ -67,12 +67,26 @@ export const authOptions = {
           throw new Error("Invalid password");
         }
 
-        return { id: user._id, email: user.email, role: user.role };
+        return {
+          id: user._id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          age: user.age,
+          gender: user.gender,
+          profilePicture: user.profilePicture,
+          joinedDate: user.joinedDate,
+          isVerified: user.isVerified,
+          username: user.username,
+          occupation: user.occupation,
+          location: user.location,
+          chatHistory: user.chatHistory,
+        };
       },
     }),
   ],
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user }) {
       try {
         await connectDB();
         const existingUser = await Users.findOne({ email: user.email });
@@ -84,10 +98,13 @@ export const authOptions = {
         if (!existingUser) {
           const newUser = new Users({
             email: user.email,
-            firstName: user.name?.split(" ")[0] || "",
-            lastName: user.name?.split(" ")[1] || "",
-            profilePicture: user.image,
+            firstName: user.firstName || "",
+            lastName: user.lastName || "",
+            profilePicture: user.profilePicture,
             isVerified: true,
+            username: user.username || "",
+            occupation: user.occupation || "",
+            location: user.location || "",
           });
           await newUser.save();
         }
@@ -98,20 +115,46 @@ export const authOptions = {
         return false;
       }
     },
-    async session({ session }) {
+    async session({ session, token }) {
       try {
         await connectDB();
         const user = await Users.findOne({ email: session.user.email });
         if (user) {
-          session.user.id = user._id.toString();
-          session.user.role = user.role;
-          session.user.isVerified = user.isVerified;
+          session.user.id = token.id || user._id.toString();
+          session.user.firstName = token.firstName || user.firstName;
+          session.user.lastName = token.lastName || user.lastName;
+          session.user.age = token.age || user.age;
+          session.user.gender = token.gender || user.gender;
+          session.user.profilePicture = token.profilePicture || user.profilePicture;
+          session.user.joinedDate = token.joinedDate || user.joinedDate;
+          session.user.isVerified = token.isVerified || user.isVerified;
+          session.user.username = token.username || user.username;
+          session.user.occupation = token.occupation || user.occupation;
+          session.user.location = token.location || user.location;
+          session.user.chatHistory = token.chatHistory || user.chatHistory;
         }
         return session;
       } catch (error) {
         console.error("Error in session callback:", error);
         return session;
       }
+    },
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.firstName = user.firstName;
+        token.lastName = user.lastName;
+        token.age = user.age;
+        token.gender = user.gender;
+        token.profilePicture = user.profilePicture;
+        token.joinedDate = user.joinedDate;
+        token.isVerified = user.isVerified;
+        token.username = user.username;
+        token.occupation = user.occupation;
+        token.location = user.location;
+        token.chatHistory = user.chatHistory;
+      }
+      return token;
     },
   },
 

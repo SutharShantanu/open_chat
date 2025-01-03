@@ -13,7 +13,7 @@ const UserSchema = new mongoose.Schema({
   password: { type: String, required: true },
   age: { type: Number },
   gender: { type: String },
-  profilePicture: { type: String, default: "/Image/defaultProfile.svg" },
+  profilePicture: { type: String, default: "https://res.cloudinary.com/openchat07/image/upload/v1735818078/Users/profile/defaultprofile.svg" },
   joinedDate: { type: Date, default: Date.now },
   isVerified: { type: Boolean, default: false },
   verificationToken: { type: String },
