@@ -14,31 +14,39 @@ import {
   HStack,
   Spinner,
   useToast,
+  Highlight,
 } from "@chakra-ui/react";
 import * as z from "zod";
+import axios from "axios";
+import { useRouter, useSearchParams } from "next/navigation";
 
-// Zod schema for OTP validation
 const otpSchema = z
   .string()
   .length(4, { message: "OTP must be exactly 4 digits." });
 
 const VerifyEmail = () => {
+  const searchParams = useSearchParams();
+  const toast = useToast();
+  const router = useRouter();
+  const [resendTimer, setResendTimer] = useState(30);
+  const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [resendTimer, setResendTimer] = useState(30); // Timer for resend button
-  const [error, setError] = useState(""); // State to hold validation error
-  const toast = useToast();
+  const [error, setError] = useState("");
 
-  // Handle OTP verification
+  useEffect(() => {
+    const paramEmail = searchParams.get("email");
+    if (paramEmail) {
+      setEmail(decodeURIComponent(paramEmail));
+    }
+  }, [searchParams]);
+
   const handleSubmit = async () => {
-    // Clear previous error
     setError("");
 
-    // Validate OTP using Zod schema
     const result = otpSchema.safeParse(otp);
 
     if (!result.success) {
-      // If validation fails, display the error message
       setError(result.error.errors[0].message);
       return;
     }
@@ -49,7 +57,7 @@ const VerifyEmail = () => {
         email: email,
         otp: otp,
       });
-      const data = response.data;
+
       if (response.status === 200 || response.status === 201) {
         toast({
           title: "User Verified",
@@ -59,21 +67,13 @@ const VerifyEmail = () => {
           isClosable: true,
         });
         router.push("/dashboard");
-      } else {
-        setError(data.error || "Something went wrong.");
-        toast({
-          title: "Error",
-          description: data.error || "Something went wrong.",
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-        });
       }
-    } catch (error) {
-      const errorMessage = error.response?.data?.error || "An error occurred while verifying the OTP.";
+    } catch (err) {
+      console.log(err)
+      const errorMessage = err.response?.data?.error || "An error occurred while verifying the OTP.";
       setError(errorMessage);
       toast({
-        title: "Error",
+        title: "Verification failed!",
         description: errorMessage,
         status: "error",
         duration: 3000,
@@ -84,7 +84,6 @@ const VerifyEmail = () => {
     }
   };
 
-  // Handle Resend OTP
   const handleResendOtp = async () => {
     setResendTimer(30);
     try {
@@ -131,21 +130,30 @@ const VerifyEmail = () => {
       <Box
         w="100%"
         maxW="md"
-        bg="white"
-        p={6}
-        boxShadow="md"
-        borderRadius="none"
       >
         <VStack spacing={4} align="stretch">
+          <Text fontSize={{ base: "xl", md: "2xl" }} textAlign="center" color="gray.900">
+            Please Check Your Email
+          </Text>
           <FormControl>
-            <FormLabel fontSize="2xl" textAlign="center">
-              Enter 4-Digit OTP
+            <FormLabel
+              fontSize="xs"
+              textAlign="center"
+              color="gray.600"
+              fontWeight={400}
+              lineHeight={1.2}
+              marginX="auto"
+            >
+              We've sent a 4-digit OTP to{" "}
+              <Highlight query={email} styles={{ bg: "gray.800", color: "white", fontFamily: "Raleway", px: 2, py: 1, rounded: "md", fontSize: "sm", letterSpacing: "wider" }}>
+                {email}
+              </Highlight>
             </FormLabel>
-            <HStack justify="center" mt={4}>
+            <HStack maxWidth="85%" justify="center" marginX="auto" justifyContent="space-around" mt={4}>
               <PinInput
                 otp
                 size="md"
-                onComplete={(value) => setOtp(value)} // Set OTP after all fields are filled
+                onComplete={(value) => setOtp(value)}
                 isDisabled={isSubmitting}
               >
                 <PinInputField
@@ -168,7 +176,6 @@ const VerifyEmail = () => {
             </HStack>
             {error && <Text color="red.500">{error}</Text>}{" "}
           </FormControl>
-
           <Button
             type="submit"
             size="md"
@@ -186,14 +193,12 @@ const VerifyEmail = () => {
           >
             Verify OTP
           </Button>
-
-          <Button
-            variant="link"
-            onClick={handleResendOtp}
-            isDisabled={resendTimer > 0}
-          >
-            {resendTimer > 0 ? `Resend OTP in ${resendTimer}s` : "Resend OTP"}
-          </Button>
+          <Text fontSize="sm" textAlign="center" color="gray.600">
+            Didn't receive an email? &nbsp;
+            <Button size="sm" variant="link" onClick={handleResendOtp} isDisabled={resendTimer > 0} color="gray.900">
+              {resendTimer > 0 ? `try again in ${resendTimer}s` : "Resend"}
+            </Button>
+          </Text>
         </VStack>
       </Box>
     </Flex>

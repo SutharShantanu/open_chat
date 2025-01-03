@@ -44,7 +44,8 @@ export const POST = async (request) => {
 
     const otp = Math.floor(1000 + Math.random() * 9000).toString();
 
-    const defaultProfileImageUrl = 'https://res.cloudinary.com/openchat07/image/upload/v1735818078/Users/profile/defaultprofile.svg';
+    const defaultProfileImageUrl =
+      "https://res.cloudinary.com/openchat07/image/upload/v1735818078/Users/profile/defaultprofile.svg";
 
     const newUser = new User({
       email,
@@ -57,11 +58,25 @@ export const POST = async (request) => {
     });
     await newUser.save();
 
+    const verificationUrl = `https://${
+      process.env.PROD_HOSTING_URL
+    }/verify?email=${decodeURIComponent(email)}&otp=${otp}`;
+
     await sendEmail({
       to: email,
-      firstName,
-      emailType: "VERIFY",
-      otp,
+      subject: "Verify your email",
+      text: `Hi ${firstName},\n\nThank you for registering on our platform. To complete your registration, please verify your email address by using the following OTP: ${otp}\n\nAlternatively, you can click the link below to verify your email:\n\n${verificationUrl}\n\nIf you did not request this, please ignore this email.\n\nBest regards,\nYour Company Team`,
+      html: `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+      <h2 style="color: #333;">Hi ${firstName},</h2>
+      <p>Thank you for registering on our platform. To complete your registration, please verify your email address by using the following OTP:</p>
+      <p style="font-size: 1.2em; font-weight: bold; color: #333;">${otp}</p>
+      <p>Alternatively, you can click the link below to verify your email:</p>
+      <a href="${verificationUrl}" style="display: inline-block; padding: 10px 20px; margin: 10px 0; font-size: 1em; color: #fff; background-color: #007bff; text-decoration: none; border-radius: 5px;">Verify Email</a>
+      <p>If you did not request this, please ignore this email.</p>
+      <p>Best regards,<br>Your Company Team</p>
+      </div>
+      `,
     });
 
     return NextResponse.json(

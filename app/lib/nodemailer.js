@@ -8,35 +8,18 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const sendEmail = async ({ to, firstName, emailType, otp }) => {
-  let subject;
-  let text;
+const sendEmail = async (options) => {
+  const { to, subject, text, html } = options;
 
-  if (!to || !emailType || !otp) {
+  if (!to || !subject || !text) {
     const missingValues = [];
     if (!to) missingValues.push("to");
-    if (!emailType) missingValues.push("emailType");
-    if (!otp) missingValues.push("otp");
+    if (!subject) missingValues.push("subject");
+    if (!text) missingValues.push("text");
 
     const errorMessage = `Missing values: ${missingValues.join(", ")}`;
     console.error(errorMessage);
     throw new Error(errorMessage);
-  }
-
-  const name = firstName || "User";
-
-  if (emailType === "VERIFY") {
-    subject = "Verify your email address";
-    text = `Hello ${name},
-
-    Thank you for registering! Please verify your email address by using the following OTP:
-
-    OTP: ${otp}
-
-    If you did not request this verification, please ignore this email.
-
-    Best regards,
-    Your Team`;
   }
 
   try {
@@ -45,6 +28,7 @@ const sendEmail = async ({ to, firstName, emailType, otp }) => {
       to,
       subject,
       text,
+      html,
     });
     console.log("Email sent successfully to:", to);
   } catch (error) {

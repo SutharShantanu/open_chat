@@ -49,6 +49,7 @@ const SignupPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const toast = useToast();
   const router = useRouter();
+  const dispatch = useDispatch();
 
   const {
     register,
@@ -73,7 +74,8 @@ const SignupPage = () => {
 
     try {
       const response = await axios.post("/api/users/signup", processedData);
-      if (response.status === 201 || response.ok) {
+
+      if (response.status === 201) {
         dispatch(
           setUserInfo({
             firstName: processedData.firstName,
@@ -81,16 +83,20 @@ const SignupPage = () => {
             email: processedData.email,
           })
         );
-        toast({
-          title: "User Account Created",
-          description: "Redirecting to verify...",
-          status: "success",
-          duration: 3000,
-          isClosable: true,
-        });
-        router.push(`/verify?email=${encodeURIComponent(processedData.email)}`);
 
       }
+      toast({
+        title: "User Account Created",
+        description: "Redirecting to verify...",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+
+      const encodedEmail = encodeURIComponent(processedData.email);
+      console.log("Encoded Email:", encodedEmail);
+      router.push(`/verify?email=${encodedEmail}`);
+
     } catch (err) {
       const errorMessage = err.response?.data?.error || "Something went wrong.";
 
@@ -112,7 +118,8 @@ const SignupPage = () => {
           isClosable: true,
         });
       }
-    } finally {
+    }
+    finally {
       setIsLoading(false);
     }
   };

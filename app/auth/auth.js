@@ -49,9 +49,15 @@ export const authOptions = {
 
           await sendEmail({
             to: email,
-            firstName: user.firstName,
-            emailType: "VERIFY",
-            otp,
+            subject: "Verify your email address",
+            html: `
+              <h1>Hello ${user.firstName},</h1>
+              <p>Thank you for registering. Please verify your email address by entering the following OTP:</p>
+              <h2>${otp}</h2>
+              <p>If you did not request this, please ignore this email.</p>
+              <p>Best regards,<br/>The Team</p>
+            `,
+            text: `Hello ${user.firstName},\n\nThank you for registering. Please verify your email address by entering the following OTP:\n\n${otp}\n\nIf you did not request this, please ignore this email.\n\nBest regards,\nThe Team`,
           });
           throw new Error("User is not verified.");
         }
