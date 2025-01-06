@@ -166,4 +166,5 @@ export const authOptions = {
     signUp: "/signup",
     verify: "/verify",
   },
+  debug: true,
 };

@@ -6,9 +6,10 @@ const Loader = () => {
         <Flex
             justify="center"
             align="center"
-            height="100vh"
             direction="column"
-            textAlign="center">
+            textAlign="center"
+            sx={{ height: "calc(100vh - 60px)" }}
+            >
             <Box mb={4}>
                 <Spinner size="xl" color="gray.900" />
             </Box>

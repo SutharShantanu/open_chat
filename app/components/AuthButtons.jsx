@@ -9,25 +9,27 @@ export default function AuthButtons() {
     <HStack spacing={4} width="100%" justify="center">
       <Button
         leftIcon={<FaGithub />}
-        onClick={() => signIn("github", { callbackUrl: "/" })}
+        onClick={() => signIn("github", { callbackUrl: "/dashboard" })}
         width="full"
-        colorScheme="blackAlpha"
+        bgColor="tw-black"
+        color="tw-white"
         variant="solid"
         padding={4}
         rounded="sm"
-        border="1px solid gray.300"
+        _hover={{ bgColor: "tw-white", color: "tw-black" }}
       >
         Continue with GitHub
       </Button>
       <Button
         leftIcon={<FaGoogle />}
-        onClick={() => signIn("google", { callbackUrl: "/" })}
+        onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
         width="full"
-        colorScheme="red"
+        bgColor="danger"
+        color="tw-white"
         variant="solid"
         padding={4}
         rounded="sm"
-        border="1px solid red"
+        _hover={{ bgColor: "tw-white", color: "danger" }}
       >
         Continue with Google
       </Button>

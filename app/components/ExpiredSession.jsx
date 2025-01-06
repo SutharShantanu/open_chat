@@ -16,11 +16,11 @@ const ExpiredSession = () => {
                         mx="auto"
                     />
                     <Heading as="h3" size={{ base: "md", md: "lg" }} mb={2}>
-                        Your Session Has Expired
+                        Oops, Your Session Has Expired
                     </Heading>
 
                     <Text color="gray.600" fontSize={{ base: "sm", md: "md" }} mb={4}>
-                        It seems like your session has expired. Please log in again to continue.
+                        Looks like you took too long. Please log in again to continue your thrilling adventure.
                     </Text>
                     <Button
                         size="md"

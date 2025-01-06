@@ -7,6 +7,7 @@ import { store, persistor } from "./store";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { SessionProvider } from "next-auth/react";
+import chakraTheme from "@/app/theme";
 
 export default function RootLayout ({ children }) {
   return (
@@ -15,7 +16,7 @@ export default function RootLayout ({ children }) {
         <SessionProvider>
           <Provider store={store}>
             <PersistGate loading={null} persistor={persistor}>
-              <ChakraProvider>
+              <ChakraProvider theme={chakraTheme}>
                 <Analytics />
                 <Navbar />
                 <Box pt="60px" bgColor="gray.100">
