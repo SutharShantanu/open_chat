@@ -9,7 +9,6 @@ import { MdBugReport } from "react-icons/md";
 import { PiSignOutBold } from "react-icons/pi";
 
 import {
-  Button,
   Text,
   HStack,
   Flex,
@@ -56,18 +55,22 @@ const Navbar = () => {
       zIndex="999"
       alignItems="center"
       justifyContent="space-between"
-      p="4"
+      paddingX={4}
+      paddingY={2}
       shadow="base"
       bg="background"
     >
-      <Text
-        fontSize={{ base: "md", md: "lg", lg: "xl" }}
-        fontWeight="bold"
-        color="heading"
-        whiteSpace="nowrap"
-      >
-        Chat App
-      </Text>
+      <Link href="/" _hover={{ textDecoration: "none" }}>
+        <Text
+          fontSize={{ base: "lg", md: "xl", lg: "2xl" }}
+          fontWeight="bold"
+          color="heading"
+          letterSpacing="wider"
+          whiteSpace="nowrap"
+          fontFamily="fantasy"        >
+          Chat App
+        </Text>
+      </Link>
       <HStack
         display={{ base: "none", md: "flex" }}
         alignItems="center"
@@ -84,7 +87,7 @@ const Navbar = () => {
               Signup
             </Link>
             <Link
-              onClick={() => signOut({callbackUrl: '/login'})}
+              onClick={() => signOut({ callbackUrl: '/login' })}
               color="primary"
               _hover={{ textDecoration: "underline", color: "primaryHover" }}
             >
@@ -113,22 +116,22 @@ const Navbar = () => {
               >
                 <MenuItem
                   as="a"
-                  href="/profile"
+                  href="/settings/profile"
                   icon={<BiSolidUser />}
                   fontSize="sm"
                   rounded="sm"
-                  bgColor={router.pathname === "/profile" ? "primary" : "tw-white"}
+                  bgColor={router.pathname === "/settings/profile" ? "primary" : "tw-white"}
                   _hover={{ bgColor: "tw-black", color: "tw-white" }}
                 >
                   My Account
                 </MenuItem>
                 <MenuItem
                   as="a"
-                  href="/profile/settings"
+                  href="/settings/account"
                   icon={<TbSettingsFilled />}
                   fontSize="sm"
                   rounded="sm"
-                  bgColor={router.pathname === "/profile/settings" ? "primary" : "tw-white"}
+                  bgColor={router.pathname === "/settings/account" ? "primary" : "tw-white"}
                   _hover={{ bgColor: "tw-black", color: "tw-white" }}
                 >
                   Profile Settings
@@ -216,7 +219,7 @@ const Navbar = () => {
               <MenuDivider />
               <MenuItem
                 as="a"
-                onClick={() => signOut({callbackUrl: '/login'}) }
+                onClick={() => signOut({ callbackUrl: '/login' })}
                 icon={<PiSignOutBold />}
                 fontSize="sm"
                 color="danger"
@@ -310,7 +313,7 @@ const Navbar = () => {
                   <Divider />
                   <Link
                     onClick={() => {
-                      signOut({callbackUrl: '/login'});
+                      signOut({ callbackUrl: '/login' });
                       onDrawerClose();
                     }}
                     color="danger"

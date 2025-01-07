@@ -19,7 +19,7 @@ export default function RootLayout ({ children }) {
               <ChakraProvider theme={chakraTheme}>
                 <Analytics />
                 <Navbar />
-                <Box pt="60px" bgColor="gray.100">
+                <Box pt="60px" bgColor="gray.100" minHeight="100vh">
                   {children}
                 </Box>
               </ChakraProvider>

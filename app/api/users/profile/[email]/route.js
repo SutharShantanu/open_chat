@@ -2,11 +2,11 @@ import { NextResponse } from "next/server";
 import connectDB from "@/app/lib/mongoDB";
 import User from "@/app/models/Users";
 
-export const GET = async (req, { params }) => {
+export const GET = async (req, context) => {
   await connectDB();
 
   try {
-    const { email } = params;
+    const { email } = await context.params;
 
     if (!email) {
       return NextResponse.json(
@@ -15,14 +15,12 @@ export const GET = async (req, { params }) => {
       );
     }
 
-    // Find the user in the database
     const user = await User.findOne({ email }).select("-password -__v");
 
     if (!user) {
       return NextResponse.json({ error: "User not found." }, { status: 404 });
     }
 
-    // Return the user data as JSON
     return NextResponse.json(user, { status: 200 });
   } catch (error) {
     console.error("Error fetching profile:", error.message);

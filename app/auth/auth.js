@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 import connectDB from "@/app/lib/mongoDB";
 import Users from "@/app/models/Users";
 import sendEmail from "@/app/lib/nodemailer";
+import generateUniqueUsername from "../api/components/generateUniqueUsername";
 
 export const authOptions = {
   providers: [
@@ -86,30 +87,62 @@ export const authOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ user }) {
+    async signIn({ user, account, profile }) {
       try {
         await connectDB();
         const existingUser = await Users.findOne({ email: user.email });
 
-        if (existingUser && !existingUser.isVerified) {
-          return false;
-        }
+        if (existingUser) {
+          if (!existingUser.isVerified) {
+            return false;
+          } else {
+            return { ...existingUser.toObject(), provider: account.provider };
+          }
+        } else {
+          const password = Math.random().toString(36).slice(-8);
+          const hashedPassword = await bcrypt.hash(password, 10);
+          const nameParts = user.name ? user.name.split(" ") : [];
+          const firstName = nameParts[0] || user.name || "";
+          const lastName =
+            nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
+          const occupation = profile.bio || "";
+          const location = profile.location || "";
 
-        if (!existingUser) {
+          const uniqueUsername = await generateUniqueUsername();
+          const defaultProfileImageUrl =
+            "https://res.cloudinary.com/openchat07/image/upload/v1735818078/Users/profile/defaultprofile.svg";
+
           const newUser = new Users({
             email: user.email,
-            firstName: user.firstName || "",
-            lastName: user.lastName || "",
-            profilePicture: user.profilePicture,
+            firstName,
+            lastName: lastName || "",
+            profilePicture: user.image || defaultProfileImageUrl,
             isVerified: true,
-            username: user.username || "",
-            occupation: user.occupation || "",
-            location: user.location || "",
+            username: uniqueUsername,
+            occupation,
+            location,
+            age: 18,
+            gender: "",
+            joinedDate: new Date(),
+            password: hashedPassword,
           });
           await newUser.save();
+          await sendEmail({
+            to: user.email,
+            subject: "Congratulations! Your account registration is successful",
+            html: `
+              <h1>Hello ${user.firstName},</h1>
+              <p>Congratulations! Your account registration is successful.</p>
+              <p>Your default password is: ${password}</p>
+              <p>Auth Provider: ${account.provider}</p>
+              <p>If you did not request this, please ignore this email.</p>
+              <p>Best regards,<br/>The Team</p>
+            `,
+            text: `Hello ${user.firstName},\n\nCongratulations! Your account registration is successful.\n\nYour default password is: ${password}\n\nAuth Provider: ${account.provider}\n\nIf you did not request this, please ignore this email.\n\nBest regards,\nThe Team`,
+          });
         }
-
-        return true;
+        console.log(account.provider);
+        return { ...newUser.toObject(), provider: account.provider };
       } catch (error) {
         console.error("Error in signIn callback:", error);
         return false;
@@ -125,13 +158,15 @@ export const authOptions = {
           session.user.lastName = token.lastName || user.lastName;
           session.user.age = token.age || user.age;
           session.user.gender = token.gender || user.gender;
-          session.user.profilePicture = token.profilePicture || user.profilePicture;
+          session.user.profilePicture =
+            token.profilePicture || user.profilePicture;
           session.user.joinedDate = token.joinedDate || user.joinedDate;
           session.user.isVerified = token.isVerified || user.isVerified;
           session.user.username = token.username || user.username;
           session.user.occupation = token.occupation || user.occupation;
           session.user.location = token.location || user.location;
           session.user.chatHistory = token.chatHistory || user.chatHistory;
+          session.user.provider = token.provider || user.provider;
         }
         return session;
       } catch (error) {
@@ -153,6 +188,7 @@ export const authOptions = {
         token.occupation = user.occupation;
         token.location = user.location;
         token.chatHistory = user.chatHistory;
+        token.provider = account?.provider || "";
       }
       return token;
     },
@@ -164,7 +200,9 @@ export const authOptions = {
   pages: {
     signIn: "/login",
     signUp: "/signup",
+    newUser: "/dashboard",
     verify: "/verify",
+    error: "/error",
   },
   debug: true,
 };

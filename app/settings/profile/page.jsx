@@ -12,7 +12,9 @@ import {
 } from "@chakra-ui/react";
 import { FaUser, FaLocationArrow, FaBriefcase, FaCalendarAlt } from "react-icons/fa";
 import { SiMaildotru } from "react-icons/si";
-import { MdEditSquare } from "react-icons/md";
+import { MdEditSquare, MdMale, MdFemale } from "react-icons/md";
+import { FaTransgenderAlt } from "react-icons/fa";
+import { BsCalendarDateFill } from "react-icons/bs";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import axios from "axios";
@@ -20,7 +22,7 @@ import Loader from "@/app/components/Loader";
 import { useRouter } from "next/navigation";
 import ExpiredSession from "@/app/components/ExpiredSession";
 
-export default function Profile() {
+export default function Profile () {
   const [userData, setUserData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const { data: session } = useSession();
@@ -53,7 +55,6 @@ export default function Profile() {
   if (!user) {
     return <ExpiredSession />;
   }
-
   return (
     <Box width="full" margin="auto" sx={{ height: "calc(100vh - 60px)" }}>
       <Card
@@ -117,6 +118,8 @@ export default function Profile() {
           <ProfileDetail icon={SiMaildotru} label="Username" value={userData?.username} />
           <ProfileDetail icon={FaBriefcase} label="Occupation" value={userData?.occupation} />
           <ProfileDetail icon={FaLocationArrow} label="Location" value={userData?.location} />
+          <ProfileDetail icon={userData?.Gender === 'Male' ? MdMale : userData?.Gender === 'Female' ? MdFemale : FaTransgenderAlt} label="Gender" value={userData?.Gender} />
+          <ProfileDetail icon={BsCalendarDateFill} label="Age" value={userData?.Age} />
           <ProfileDetail
             icon={FaCalendarAlt}
             label="Joined Date"
