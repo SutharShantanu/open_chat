@@ -106,7 +106,7 @@ export default function Profile () {
             aria-label="Edit Profile"
             rounded="full"
             size="sm"
-            onClick={() => router.push('/edit-profile')}
+            onClick={() => router.push('/settings/edit-profile')}
             icon={<MdEditSquare />}
             bgColor="tw-white"
             _hover={{ bgColor: "tw-black", color: "tw-white" }}

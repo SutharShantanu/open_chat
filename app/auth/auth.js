@@ -92,11 +92,16 @@ export const authOptions = {
         await connectDB();
         const existingUser = await Users.findOne({ email: user.email });
 
+        let newUser;
+
         if (existingUser) {
           if (!existingUser.isVerified) {
             return false;
           } else {
-            return { ...existingUser.toObject(), provider: account.provider };
+            return {
+              ...existingUser.toObject(),
+              provider: account?.provider || "credentials",
+            };
           }
         } else {
           const password = Math.random().toString(36).slice(-8);
@@ -112,7 +117,7 @@ export const authOptions = {
           const defaultProfileImageUrl =
             "https://res.cloudinary.com/openchat07/image/upload/v1735818078/Users/profile/defaultprofile.svg";
 
-          const newUser = new Users({
+          newUser = new Users({
             email: user.email,
             firstName,
             lastName: lastName || "",
@@ -129,20 +134,92 @@ export const authOptions = {
           await newUser.save();
           await sendEmail({
             to: user.email,
-            subject: "Congratulations! Your account registration is successful",
+            subject: "OpenChat - Registration Successful",
             html: `
-              <h1>Hello ${user.firstName},</h1>
-              <p>Congratulations! Your account registration is successful.</p>
-              <p>Your default password is: ${password}</p>
-              <p>Auth Provider: ${account.provider}</p>
-              <p>If you did not request this, please ignore this email.</p>
-              <p>Best regards,<br/>The Team</p>
+              <div style="max-width: 570px; margin: 0 auto; padding: 20px;">
+                <header style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <img src="https://res.cloudinary.com/openchat07/image/upload/v1736329296/Logo/OpenChat.png" alt="Logo" width="50" height="50" />
+                    <h1 style="font-size: 24px; font-weight: bold; color: #1F2937;">Welcome to Our Service</h1>
+                  </div>
+                </header>
+
+                <div style="font-family: sans-serif; color: #4B5563;">
+                  <h2 style="font-size: 20px; margin-bottom: 16px;">Hello, Shantanu Suthar!</h2>
+                  <p style="font-size: 16px; line-height: 1.5;">
+                    Welcome to our service! Below are your account details:
+                  </p>
+
+                  <div style="background-color: #F9FAFB; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); border-radius: 8px; padding: 20px; margin-top: 20px; gap: 20px;">
+                    <div style="display: flex; align-items: center; gap: 16px;">
+                      <img src="https://res.cloudinary.com/openchat07/image/upload/v1735818078/Users/profile/defaultprofile.svg" alt="Profile Picture" width="100" height="100" style="border-radius: 50%; border: 4px solid #3B82F6;" />
+                      <div>
+                        <div style="font-size: 18px; font-weight: 600;">shantanusuthar</div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                          <span style="padding: 6px 12px; font-size: 14px; border-radius: 12px; background-color: #10B981; color: #F8F8F8;">
+                            Verified
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style="margin-top: 16px;">
+                      <div style="display: flex; justify-content: space-between;">
+                        <span style="font-weight: bold;">Email:</span>
+                        <span>shantanu@example.com</span>
+                      </div>
+                      <div style="display: flex; justify-content: space-between;">
+                        <span style="font-weight: bold;">Age:</span>
+                        <span>25</span>
+                      </div>
+                      <div style="display: flex; justify-content: space-between;">
+                        <span style="font-weight: bold;">Occupation:</span>
+                        <span>Software Developer</span>
+                      </div>
+                      <div style="display: flex; justify-content: space-between;">
+                        <span style="font-weight: bold;">Location:</span>
+                        <span>Mumbai, India</span>
+                      </div>
+                      <div style="display: flex; justify-content: space-between;">
+                        <span style="font-weight: bold;">Gender:</span>
+                        <span>Male</span>
+                      </div>
+                      <div style="display: flex; justify-content: space-between;">
+                        <span style="font-weight: bold;">Joined:</span>
+                        <span>2023-01-15</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style="margin-top: 20px; text-align: center;">
+                    <a href="https://example.com/dashboard" style="background-color: #3B82F6; color: #F8F8F8; padding: 10px 20px; border-radius: 8px; font-size: 18px; transition: background-color 0.3s; text-decoration: none;">
+                      Go to Dashboard
+                    </a>
+                  </div>
+
+                  <p style="font-size: 16px; line-height: 1.5;">
+                    If you have any questions or need help, don't hesitate to{" "}
+                    <a href="mailto:support@example.com" style="color: #3B82F6;">reach out to our support team</a>.
+                  </p>
+                </div>
+
+                <footer style="margin-top: 40px; text-align: center; font-size: 14px; color: #4B5563;">
+                  <p>© 2025 Our Service. All rights reserved.</p>
+                  <p>
+                    <a href="https://example.com/privacy" style="color: #3B82F6; text-decoration: underline;">Privacy Policy</a> |
+                    <a href="https://example.com/terms" style="color: #3B82F6; text-decoration: underline;">Terms of Service</a>
+                  </p>
+                </footer>
+              </div>
             `,
-            text: `Hello ${user.firstName},\n\nCongratulations! Your account registration is successful.\n\nYour default password is: ${password}\n\nAuth Provider: ${account.provider}\n\nIf you did not request this, please ignore this email.\n\nBest regards,\nThe Team`,
+            text: `Hello ${firstName},\n\nCongratulations! Your account registration is successful.`,
           });
         }
         console.log(account.provider);
-        return { ...newUser.toObject(), provider: account.provider };
+        return {
+          ...newUser?.toObject(),
+          provider: account?.provider || "credentials",
+        };
       } catch (error) {
         console.error("Error in signIn callback:", error);
         return false;
@@ -166,7 +243,7 @@ export const authOptions = {
           session.user.occupation = token.occupation || user.occupation;
           session.user.location = token.location || user.location;
           session.user.chatHistory = token.chatHistory || user.chatHistory;
-          session.user.provider = token.provider || user.provider;
+          session.user.provider = token.provider || "credentials";
         }
         return session;
       } catch (error) {
@@ -174,7 +251,7 @@ export const authOptions = {
         return session;
       }
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id;
         token.firstName = user.firstName;
@@ -188,7 +265,7 @@ export const authOptions = {
         token.occupation = user.occupation;
         token.location = user.location;
         token.chatHistory = user.chatHistory;
-        token.provider = account?.provider || "";
+        token.provider = account?.provider || "credentials";
       }
       return token;
     },
