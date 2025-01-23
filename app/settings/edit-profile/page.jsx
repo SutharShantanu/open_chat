@@ -17,10 +17,11 @@ import {
   Icon,
   Select,
   Heading,
+  IconButton,
 } from "@chakra-ui/react";
 import { FaUser, FaLocationArrow, FaBriefcase, FaCalendarAlt } from "react-icons/fa";
 import { SiMaildotru } from "react-icons/si";
-import { MdEditSquare, MdMale, MdFemale } from "react-icons/md";
+import { MdEditSquare, MdMale, MdFemale, MdEdit } from "react-icons/md";
 import { FaTransgenderAlt } from "react-icons/fa";
 import { BsCalendarDateFill } from "react-icons/bs";
 import Loader from "@/app/components/Loader";
@@ -30,7 +31,6 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
-import defaultProfile from "@/public/Image/defaultProfile.svg";
 import ProfileImageModal from "../../components/Modals/ProfileImage";
 import { useSession } from "next-auth/react";
 import axios from "axios";
@@ -148,6 +148,9 @@ const ProfileSelectField = ({ id, label, icon, register, error, options }) => (
 export default function EditProfile () {
   const { data: session } = useSession();
   const user = session?.user;
+  const userId = session?.user?.id;
+  const [isLoading, setIsLoading] = useState(false);
+  const { isOpen, onClose, onOpen } = useDisclosure();
 
   const [userData, setUserData] = useState({
     firstName: user?.firstName || "",
@@ -156,7 +159,7 @@ export default function EditProfile () {
     email: user?.email || "",
     password: "",
     age: user?.age || "",
-    profilePicture: user?.profilePicture || defaultProfile,
+    profilePicture: user?.profilePicture,
     joinedDate: user?.joinedDate || Date.now(),
     isVerified: user?.isVerified || false,
     verificationToken: user?.verificationToken || "",
@@ -168,14 +171,14 @@ export default function EditProfile () {
 
   useEffect(() => {
     if (user) {
-      setUserData({
+      setUserData((prevData) => ({
+        ...prevData,
         firstName: user.firstName || "",
         lastName: user.lastName || "",
         username: user.username || "",
         email: user.email || "",
-        password: "",
         age: user.age || "",
-        profilePicture: user.profilePicture || defaultProfile,
+        profilePicture: user.profilePicture,
         joinedDate: user.joinedDate || Date.now(),
         isVerified: user.isVerified || false,
         verificationToken: user.verificationToken || "",
@@ -183,14 +186,26 @@ export default function EditProfile () {
         occupation: user.occupation || "",
         location: user.location || "",
         gender: user.gender || "",
-      });
+      }));
     }
   }, [user]);
 
-  const [avatar, setAvatar] = useState(userData.avatar || "");
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const { isOpen, onClose, onOpen } = useDisclosure();
+  const [avatar, setAvatar] = useState(userData.profilePicture);
+
+  const handleImageSave = async (userId, croppedFile) => {
+    const formData = new FormData();
+    formData.append("profilePicture", croppedFile);
+
+    try {
+      const response = await axios.put(`/api/users/edit-profile/${userId}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      setAvatar(response.data.profilePicture);
+      onClose();
+    } catch (error) {
+      console.error("Error updating profile picture:", error.response?.data || error.message);
+    }
+  };
 
   const {
     register,
@@ -212,8 +227,20 @@ export default function EditProfile () {
   const onSubmitProfile = async (data) => {
     setIsLoading(true);
     try {
-      const response = await axios.put(`/api/users/profile`, data);
-      setUserData(response.data);
+      if (!userId) {
+        console.error("User ID not found in session.");
+        return;
+      }
+
+      const payload = { ...data, id: userId };
+      const response = await axios.post(`/api/users/edit-profile`, payload);
+
+      if (response.status === 200) {
+        setUserData(response.data.user);
+        alert("Profile updated successfully");
+      } else {
+        console.error("Failed to update profile:", response.data?.error || "Unknown error");
+      }
     } catch (error) {
       console.error("Error updating profile:", error.response?.data || error.message);
     } finally {
@@ -231,11 +258,6 @@ export default function EditProfile () {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const removeImage = () => {
-    setAvatar("");
-    setSelectedFile(null);
   };
 
   useEffect(() => {
@@ -274,33 +296,31 @@ export default function EditProfile () {
           borderRadius="md"
         >
           <FormControl width="fit-content">
-            <Box position="relative" textAlign="center">
+            <Box position="relative" textAlign="center" >
               <Avatar
                 width="150px"
                 height="auto"
                 name={`${userData.firstName} ${userData.lastName}`}
-                src={selectedFile || avatar || defaultProfile}
+                src={avatar}
                 boxShadow="lg"
                 mb={4}
               />
-              <Button
-                rounded="sm"
-                shadow="sm"
+              <IconButton
                 size="sm"
-                py={1}
-                px={2}
+                rounded="full"
+                onClick={onOpen}
+                icon={<MdEdit />}
                 bgColor="tw-black"
                 color="tw-white"
-                onClick={onOpen}
+                border="1px solid transparent"
+                _hover={{ bgColor: "tw-white", color: "tw-black", borderColor: "tw-black" }}
                 display="flex"
                 position="absolute"
                 alignItems="center"
                 justifyContent="center"
-                bottom="12"
-                right="8"
-              >
-                Edit Picture
-              </Button>
+                bottom="0"
+                right="0"
+              />
             </Box>
           </FormControl>
 
@@ -446,6 +466,12 @@ export default function EditProfile () {
           </form>
         </Box>
       </Flex>
+      <ProfileImageModal
+        isOpen={isOpen}
+        onClose={onClose}
+        currentImage={avatar}
+        onImageSave={handleImageSave}
+      />
     </Box>
   );
 }
