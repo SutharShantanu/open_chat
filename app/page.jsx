@@ -29,10 +29,10 @@ import {
 
 let socket;
 
-export default function Home() {
+export default function Home () {
   // const dispatch = useDispatch();
   // const { username, room, isConnected, transport, selectedRoom, rooms } =
-    // useSelector((state) => state.chat);
+  // useSelector((state) => state.chat);
   const [modalVisible, setModalVisible] = useState(false);
   const router = useRouter();
 

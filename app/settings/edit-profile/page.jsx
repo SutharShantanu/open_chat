@@ -16,6 +16,7 @@ import {
   Spinner,
   Icon,
   Select,
+  Heading,
 } from "@chakra-ui/react";
 import { FaUser, FaLocationArrow, FaBriefcase, FaCalendarAlt } from "react-icons/fa";
 import { SiMaildotru } from "react-icons/si";
@@ -53,11 +54,6 @@ const profileSchema = z.object({
   email: z
     .string()
     .email("Please enter a valid email address"),
-  password: z
-    .string()
-    .min(6, "Password must be at least 6 characters")
-    .regex(/(?=.*[0-9])(?=.*[a-zA-Z])/, "Password must contain at least one letter and one number")
-    .optional(),
   occupation: z
     .string()
     .max(50, "Occupation can't be longer than 50 characters")
@@ -74,6 +70,20 @@ const profileSchema = z.object({
     .max(60, "Age must be 60 or younger")
     .optional(),
   gender: z.enum(["Male", "Female", "Trans"]).optional(),
+});
+
+const changePasswordSchema = z.object({
+  newPassword: z
+    .string()
+    .min(6, "Password must be at least 6 characters")
+    .regex(/(?=.*[0-9])(?=.*[a-zA-Z])/, "Password must contain at least one letter and one number"),
+  confirmPassword: z
+    .string()
+    .min(6, "Password must be at least 6 characters")
+    .regex(/(?=.*[0-9])(?=.*[a-zA-Z])/, "Password must contain at least one letter and one number"),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
 });
 
 const ProfileInputField = ({ id, label, icon, register, error, placeholder, type = "text" }) => (
@@ -191,6 +201,14 @@ export default function EditProfile () {
     defaultValues: userData,
   });
 
+  const {
+    register: registerPassword,
+    handleSubmit: handleSubmitPassword,
+    formState: { errors: passwordErrors },
+  } = useForm({
+    resolver: zodResolver(changePasswordSchema),
+  });
+
   const onSubmitProfile = async (data) => {
     setIsLoading(true);
     try {
@@ -198,6 +216,18 @@ export default function EditProfile () {
       setUserData(response.data);
     } catch (error) {
       console.error("Error updating profile:", error.response?.data || error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const onSubmitPassword = async (data) => {
+    setIsLoading(true);
+    try {
+      await axios.put(`/api/users/change-password`, data);
+      alert("Password changed successfully");
+    } catch (error) {
+      console.error("Error changing password:", error.response?.data || error.message);
     } finally {
       setIsLoading(false);
     }
@@ -232,7 +262,6 @@ export default function EditProfile () {
         p={8}
         borderRadius="lg"
         boxShadow="lg"
-        mb={8}
       >
         <Flex
           direction={{ base: "column", md: "row" }}
@@ -287,17 +316,17 @@ export default function EditProfile () {
       </Card>
       <Flex
         p={8}
-        borderRadius="lg"
-        boxShadow="lg"
         width="full"
-        mb={8}>
-        <Box p={6} bgColor="tw-white" borderRadius="lg" boxShadow="lg" marginX="8">
+        direction={{ base: "column", md: "row" }}
+        gap={8}
+      >
+        <Box flex="1" p={6} bgColor="tw-white" borderRadius="lg" boxShadow="lg">
           <Text fontSize="2xl" fontWeight="bold" mb={6} color="heading">
             Profile Settings
           </Text>
           <form onSubmit={handleSubmit(onSubmitProfile)}>
             <Stack spacing={4}>
-              <Flex gap={4}>
+              <Flex gap={4} direction={{ base: "column", md: "row" }}>
                 <ProfileInputField
                   id="firstName"
                   label="First Name"
@@ -315,7 +344,7 @@ export default function EditProfile () {
                   placeholder="Enter your last name"
                 />
               </Flex>
-              <Flex gap={4}>
+              <Flex gap={4} direction={{ base: "column", md: "row" }}>
                 <ProfileInputField
                   id="username"
                   label="Username"
@@ -333,7 +362,7 @@ export default function EditProfile () {
                   placeholder="Enter your email"
                 />
               </Flex>
-              <Flex gap={4}>
+              <Flex gap={4} direction={{ base: "column", md: "row" }}>
                 <ProfileInputField
                   id="occupation"
                   label="Occupation"
@@ -351,7 +380,7 @@ export default function EditProfile () {
                   placeholder="Enter your location"
                 />
               </Flex>
-              <Flex gap={4}>
+              <Flex gap={4} direction={{ base: "column", md: "row" }}>
                 <ProfileInputField
                   id="age"
                   label="Age"
@@ -381,13 +410,42 @@ export default function EditProfile () {
             </Stack>
           </form>
         </Box>
-        <Box p={6} bgColor="tw-white" borderRadius="lg" boxShadow="lg" marginX="8">
-          <Text fontSize="2xl" fontWeight="bold" mb={6} color="heading">
+        <Box flex="1" p={6} bgColor="tw-white" borderRadius="lg" boxShadow="lg">
+          <Heading fontSize="2xl" fontWeight="bold" mb={6} color="heading">
             Change Password
-          </Text>
+          </Heading>
+          <form onSubmit={handleSubmitPassword(onSubmitPassword)}>
+            <Stack spacing={4}>
+              <ProfileInputField
+                id="newPassword"
+                label="New Password"
+                icon={FaUser}
+                register={registerPassword}
+                error={passwordErrors.newPassword}
+                placeholder="Enter your new password"
+                type="password"
+              />
+              <ProfileInputField
+                id="confirmPassword"
+                label="Confirm Password"
+                icon={FaUser}
+                register={registerPassword}
+                error={passwordErrors.confirmPassword}
+                placeholder="Confirm your new password"
+                type="password"
+              />
+              <Button
+                type="submit"
+                colorScheme="blue"
+                isLoading={isLoading}
+                loadingText="Updating..."
+              >
+                Change Password
+              </Button>
+            </Stack>
+          </form>
         </Box>
       </Flex>
-
     </Box>
   );
 }
